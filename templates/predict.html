@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Heart disease prediction using a trained machine learning model. Enter your health parameters for an AI-driven risk score.">
+    <title>Heart Disease Prediction | MediCare AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">    
+</head>
+<body>
+    <div class="bg-particles" aria-hidden="true">
+        <div class="orb"></div>
+        <div class="orb"></div>
+        <div class="orb"></div>
+    </div>
+
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <a href="/" class="navbar-brand">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MediCare Logo">
+                <span>MediCare</span>
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="/">Home</a></li>
+                <li><a href="/predict" class="active">Prediction</a></li>
+                <li><a href="/profile">Profile</a></li>
+                <li><a href="/contact">Contact</a></li>
+                <li><a href="/about">About</a></li>
+            </ul>
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <section class="hero" id="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span class="pulse-dot"></span>
+                    Heart Disease Risk Check
+                </div>
+                <h1 class="hero-title">AI-Powered Heart Disease Prediction</h1>
+                <p class="hero-subtitle">
+                    Enter your health information below to get a model-based estimate of your cardiovascular risk.
+                    This interface uses the trained `best_model.pkl` model from the project root.
+                </p>
+                <a href="#prediction-form" class="btn btn-primary">Start Assessment</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="services-section" id="prediction-form" style="padding: 80px 0 40px;">
+        <div class="container">
+            <div class="section-header reveal">
+                <div class="section-label">Prediction Workflow</div>
+                <h2 class="section-title">How to Use the Heart Disease Predictor</h2>
+                <p class="section-subtitle">
+                    Follow the instructions, enter your readings, and review the AI-generated result with safety guidance.
+                </p>
+            </div>
+
+            <div class="predict-grid">
+                <div class="predict-panel">
+                    <h3>Instructions</h3>
+                    <ul style="list-style:disc inside;line-height:1.8;color:var(--gray-200);">
+                        {% for item in instructions %}
+                        <li>{{ item }}</li>
+                        {% endfor %}
+                    </ul>
+
+                    <h3 style="margin-top:32px;margin-bottom:16px;color:#fff;">Precautions</h3>
+                    <ul style="list-style:disc inside;line-height:1.8;color:var(--gray-200);">
+                        {% for item in precautions %}
+                        <li>{{ item }}</li>
+                        {% endfor %}
+                    </ul>
+
+                    <div style="margin-top:32px;padding:20px;border-radius:18px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.18);">
+                        <strong>Important:</strong> This tool is not a replacement for medical advice. Always consult a physician for diagnosis and treatment.
+                    </div>
+
+                    <div class="chart-card">
+                        <h3>Input Breakdown</h3>
+                        <p style="color:var(--gray-200);margin-bottom:16px;">A visual graph of your entered health metrics appears below.</p>
+                        <div class="chart-wrapper">
+                            <canvas id="predictDetailsChart" width="360" height="360"></canvas>
+                        </div>
+                        <div class="chart-legend" id="chartLegend"></div>
+                    </div>
+                </div>
+
+                <div class="predict-panel">
+                    <h3>Enter your details</h3>
+                    <form id="predictForm" method="post" action="{{ url_for('predict') }}#prediction-form" novalidate>
+                        <div style="display:grid;gap:18px;">
+                            <label>
+                                Age
+                                <input type="number" name="age" value="{{ form.age }}" min="1" max="120" placeholder="Age in years" required>
+                            </label>
+                            <label>
+                                Sex
+                                <select name="sex" required>
+                                    <option value="0" {% if form.sex == '0' %}selected{% endif %}>Female</option>
+                                    <option value="1" {% if form.sex == '1' %}selected{% endif %}>Male</option>
+                                </select>
+                            </label>
+                            <label>
+                                Chest Pain Type
+                                <select name="chest_pain" required>
+                                    <option value="0" {% if form.chest_pain == '0' %}selected{% endif %}>Asymptomatic</option>
+                                    <option value="1" {% if form.chest_pain == '1' %}selected{% endif %}>Atypical Angina</option>
+                                    <option value="2" {% if form.chest_pain == '2' %}selected{% endif %}>Non-anginal Pain</option>
+                                    <option value="3" {% if form.chest_pain == '3' %}selected{% endif %}>Typical Angina</option>
+        
+                                </select>
+                            </label>
+                            <label>
+                                Resting Blood Pressure (mm Hg)
+                                <input type="number" name="resting_bp" value="{{ form.resting_bp }}" min="80" max="240" placeholder="Resting BP" required>
+                            </label>
+                            <label>
+                                Cholesterol (mg/dL)
+                                <input type="number" name="cholesterol" value="{{ form.cholesterol }}" min="100" max="450" placeholder="Cholesterol level" required>
+                            </label>
+                            <label>
+                                Fasting Blood Sugar > 120 mg/dL
+                                <select name="fasting_bs" required>
+                                    <option value="0" {% if form.fasting_bs == '0' %}selected{% endif %}>No</option>
+                                    <option value="1" {% if form.fasting_bs == '1' %}selected{% endif %}>Yes</option>
+                                </select>
+                            </label>
+                            <label>
+                                Resting ECG
+                                <select name="resting_ecg" required>
+                                    <option value="0" {% if form.resting_ecg == '0' %}selected{% endif %}>Left ventricular hypertrophy</option>
+                                    <option value="1" {% if form.resting_ecg == '1' %}selected{% endif %}>Normal</option>
+                                    <option value="2" {% if form.resting_ecg == '2' %}selected{% endif %}>ST-T wave abnormality</option>
+                                    
+                                </select>
+                            </label>
+                            <label>
+                                Max Heart Rate Achieved
+                                <input type="number" name="max_hr" value="{{ form.max_hr }}" min="60" max="220" placeholder="Max heart rate" required>
+                            </label>
+                            <label>
+                                Exercise-Induced Angina
+                                <select name="exercise_angina" required>
+                                    <option value="0" {% if form.exercise_angina == '0' %}selected{% endif %}>No</option>
+                                    <option value="1" {% if form.exercise_angina == '1' %}selected{% endif %}>Yes</option>
+                                </select>
+                            </label>
+                            <label>
+                                ST Depression (Oldpeak)
+                                <input type="number" step="0.1" name="oldpeak" value="{{ form.oldpeak }}" min="0" max="10" placeholder="ST depression" required>
+                            </label>
+                            <label>
+                                ST Slope
+                                <select name="st_slope" required>
+                                    <option value="0" {% if form.st_slope == '0' %}selected{% endif %}>Downsloping</option>
+                                    <option value="1" {% if form.st_slope == '1' %}selected{% endif %}>Flat</option>
+                                    <option value="2" {% if form.st_slope == '2' %}selected{% endif %}>Upsloping</option>
+                                    
+                                    
+                                </select>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="margin-top:24px;">Predict Now</button>
+                    </form>
+
+                    {% if result %}
+                    <div id="prediction-result-wrapper">
+                        <div id="prediction-result" class="card result-box" style="margin-top:28px;padding:24px;border-radius:22px;">
+                            <h3 style="margin-bottom:10px;color:white;">{{ result.label }}</h3>
+                            <p style="color:var(--gray-200);">{{ result.message }}</p>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div id="prediction-result-wrapper"></div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- ===== FOOTER WITH CONTACT DETAILS ===== -->
+    <footer class="footer" id="contact">
+        <div class="container">
+            <!-- Footer Top: 4-Column Grid -->
+            <div class="footer-grid reveal">
+                <!-- Column 1: Brand + Description -->
+                <div class="footer-col">
+                    <div class="footer-brand">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MediCare Logo">
+                        <span>MediCare AI</span>
+                    </div>
+                    <p class="footer-about">
+                        AI-powered medical prediction platform providing advanced heart disease and cancer risk
+                        assessments for better health outcomes.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="social-link" aria-label="Facebook">📘</a>
+                        <a href="#" class="social-link" aria-label="Twitter">🐦</a>
+                        <a href="#" class="social-link" aria-label="LinkedIn">💼</a>
+                        <a href="#" class="social-link" aria-label="Instagram">📸</a>
+                    </div>
+                </div>
+
+                <!-- Column 2: Quick Links -->
+                <div class="footer-col">
+                    <h4 class="footer-heading">Quick Links</h4>
+                    <ul class="footer-nav">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/about">About Us</a></li>
+                        <li><a href="/predict">predictions</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 3: Our Services -->
+                <div class="footer-col">
+                    <h4 class="footer-heading">Our Services</h4>
+
+                    <ul class="footer-nav">
+                        <li><a href="/predict">Heart Disease Prediction</a></li>
+                        <li><a href="#">Cancer Risk Analysis</a></li>
+                        <li><a href="#">Health Dashboard</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 4: Contact Details -->
+                <div class="footer-col">
+                    <h4 class="footer-heading">Contact Us</h4>
+                    <div class="footer-contact-list">
+                        <div class="footer-contact-item">
+                            <span class="footer-contact-icon">📞</span>
+                            <div>
+                                <p>+91 98765 43210</p>
+                                <p>+91 87654 32109</p>
+                            </div>
+                        </div>
+                        <div class="footer-contact-item">
+                            <span class="footer-contact-icon">✉️</span>
+                            <div>
+                                <p>contact@medicareai.com</p>
+                                <p>support@medicareai.com</p>
+                            </div>
+                        </div>
+                        <div class="footer-contact-item">
+                            <span class="footer-contact-icon">📍</span>
+                            <div>
+                                <p>123 Health Tech Park,<br>Anna Nagar, Chennai - 600040,<br>Tamil Nadu, India</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Bottom Bar -->
+            <div class="footer-bottom">
+                <p class="footer-text">© 2026 MediCare AI. All rights reserved. For educational purposes only.</p>
+                <div class="footer-bottom-links">
+                    <a href="#">Terms of Service</a>
+                    <span class="footer-divider">|</span>
+                    <a href="#">Disclaimer</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ===== SCROLL TO TOP ===== -->
+    <button class="scroll-top" id="scrollTopBtn" aria-label="Scroll to top">↑</button>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        function getNumber(value, max) {
+            const num = parseFloat(value);
+            if (Number.isNaN(num) || num <= 0) return 0;
+            return Math.min(num, max);
+        }
+
+        function drawPredictionChart() {
+            const canvas = document.getElementById('predictDetailsChart');
+            const legend = document.getElementById('chartLegend');
+            const form = document.getElementById('predictForm');
+            if (!canvas || !legend || !form) return;
+
+            const values = [
+                { label: 'Resting BP', value: getNumber(form.resting_bp.value, 240), raw: form.resting_bp.value || '0', max: 240 },
+                { label: 'Cholesterol', value: getNumber(form.cholesterol.value, 450), raw: form.cholesterol.value || '0', max: 450 },
+                { label: 'Max HR', value: getNumber(form.max_hr.value, 220), raw: form.max_hr.value || '0', max: 220 },
+                { label: 'Oldpeak', value: getNumber(form.oldpeak.value, 10), raw: form.oldpeak.value || '0', max: 10 }
+            ];
+
+            const colors = [
+                'rgba(59, 130, 246, 0.88)',
+                'rgba(20, 184, 166, 0.88)',
+                'rgba(168, 85, 247, 0.88)',
+                'rgba(248, 113, 113, 0.88)',
+                'rgba(34, 197, 94, 0.88)'
+            ];
+
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
+
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.resetTransform();
+            ctx.scale(dpr, dpr);
+            ctx.clearRect(0, 0, rect.width, rect.height);
+
+            const padding = 28;
+            const chartHeight = rect.height - padding * 2 - 40;
+            const chartWidth = rect.width - padding * 2;
+            const xStart = padding;
+            const yBase = rect.height - padding - 14;
+            const barSpacing = 18;
+            const barCount = values.length;
+            const barWidth = (chartWidth - barSpacing * (barCount - 1)) / barCount;
+
+            ctx.font = '700 1rem Arial, sans-serif';
+            ctx.fillStyle = '#FFFFFF';
+            ctx.textAlign = 'left';
+            ctx.fillText('Input Graph', xStart, 26);
+
+            ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < 5; i++) {
+                const y = padding + (chartHeight / 4) * i + 20;
+                ctx.beginPath();
+                ctx.moveTo(xStart, y);
+                ctx.lineTo(rect.width - padding, y);
+                ctx.stroke();
+            }
+
+            values.forEach((item, index) => {
+                const normalizedValue = item.max > 0 ? item.value / item.max : 0;
+                const barHeight = Math.max(normalizedValue, 0.04) * chartHeight;
+                const x = xStart + index * (barWidth + barSpacing);
+                const y = yBase - barHeight;
+
+                ctx.fillStyle = colors[index];
+                ctx.beginPath();
+                ctx.roundRect(x, y, barWidth, barHeight, 12);
+                ctx.fill();
+
+                ctx.fillStyle = '#FFFFFF';
+                ctx.font = '600 0.9rem Arial, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(item.raw, x + barWidth / 2, y - 10);
+
+                ctx.fillStyle = 'rgba(255,255,255,0.76)';
+                ctx.font = '400 0.82rem Arial, sans-serif';
+                ctx.fillText(item.label, x + barWidth / 2, yBase + 22);
+            });
+
+            legend.innerHTML = values.map((item, index) => `
+                <div class="chart-legend-item">
+                    <span class="legend-dot" style="background:${colors[index]}"></span>
+                    <span>${item.label}: ${item.raw}</span>
+                </div>
+            `).join('');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            drawPredictionChart();
+            const form = document.getElementById('predictForm');
+            if (!form || !form.querySelectorAll) return;
+            form.querySelectorAll('input, select').forEach(element => {
+                element.addEventListener('input', drawPredictionChart);
+                element.addEventListener('change', drawPredictionChart);
+            });
+        });
+    </script>
+
+    <script>
+        window.addEventListener('scroll', function () {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+            const scrollTopBtn = document.getElementById('scrollTopBtn');
+            if (window.scrollY > 300) {
+                scrollTopBtn.style.display = 'block';
+            } else {
+                scrollTopBtn.style.display = 'none';
+            }
+        });
+
+        const predictForm = document.getElementById('predictForm');
+        const predictionResultWrapper = document.getElementById('prediction-result-wrapper');
+
+        if (predictForm) {
+            predictForm.addEventListener('submit', async function (event) {
+                event.preventDefault();
+                const formData = new FormData(predictForm);
+                const response = await fetch(predictForm.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    return;
+                }
+
+                const data = await response.json();
+                if (predictionResultWrapper) {
+                    predictionResultWrapper.innerHTML = `
+                        <div id="prediction-result" class="card result-box" style="margin-top:28px;padding:24px;border-radius:22px;">
+                            <h3 style="margin-bottom:10px;color:white;">${data.label}</h3>
+                            <p style="color:var(--gray-200);">${data.message}</p>
+                        </div>
+                    `;
+                    document.getElementById('prediction-result').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            });
+        }
+    </script>
+</body>
+</html>
