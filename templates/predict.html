@@ -56,14 +56,19 @@
         <div class="container">
             <div class="section-header reveal">
                 <div class="section-label">Prediction Workflow</div>
-                <h2 class="section-title">How to Use the Heart Disease Predictor</h2>
+                <h2 class="section-title">Choose Your Prediction Type</h2>
                 <p class="section-subtitle">
-                    Follow the instructions, enter your readings, and review the AI-generated result with safety guidance.
+                    Select heart disease or cancer prediction and enter the values in the section below.
                 </p>
             </div>
 
+            <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:32px;">
+                <a href="#heart-prediction" class="btn btn-secondary" style="flex:1;min-width:180px;">Heart Disease Prediction</a>
+                <a href="#cancer-prediction" class="btn btn-secondary" style="flex:1;min-width:180px;">Cancer Prediction</a>
+            </div>
+
             <div class="predict-grid">
-                <div class="predict-panel">
+                <div class="predict-panel" id="heart-prediction">
                     <h3>Instructions</h3>
                     <ul style="list-style:disc inside;line-height:1.8;color:var(--gray-200);">
                         {% for item in instructions %}
@@ -179,7 +184,7 @@
                     <div id="prediction-result-wrapper"></div>
                     {% endif %}
 
-                    <div style="margin-top:48px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.08);">
+                    <div id="cancer-prediction" style="margin-top:48px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.08);">
                         <h3>Cancer Risk Prediction</h3>
                         <p style="color:var(--gray-200);margin-bottom:20px;">Use the cancer predictor below to estimate risk based on demographic and lifestyle inputs.</p>
                         <form id="cancerPredictForm" method="post" action="{{ url_for('predict') }}#prediction-form" novalidate>
