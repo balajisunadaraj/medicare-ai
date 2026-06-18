@@ -235,8 +235,7 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-@app.before_request
-def create_tables():
+with app.app_context():
     db.create_all()
 
 
