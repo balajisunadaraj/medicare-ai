@@ -22,15 +22,13 @@
                 <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MediCare Logo">
                 <span>MediCare</span>
             </a>
-
             <ul class="nav-links" id="navLinks">
                 <li><a href="/">Home</a></li>
-                <li><a href="/predict">Prediction</a></li>
+                <li><a href="/predict" class="active">Prediction</a></li>
                 <li><a href="/profile">Profile</a></li>
                 <li><a href="/contact">Contact</a></li>
                 <li><a href="/about">About</a></li>
             </ul>
-
             <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
                 <span></span>
                 <span></span>
@@ -190,13 +188,13 @@
                                         headers: { 'X-Requested-With': 'XMLHttpRequest' }
                                     });
                                     const json = await resp.json();
-                                    resultWrapper.innerHTML = `\n+                                        <div class="card result-box" style="margin-top:28px;padding:24px;border-radius:22px;">\n+                                            <h3 style="margin-bottom:10px;color:white;">${json.label}</h3>\n+                                            <p style="color:var(--gray-200);">${json.message}</p>\n+                                        </div>`;
+                                    resultWrapper.innerHTML = `\n                                        <div class="card result-box" style="margin-top:28px;padding:24px;border-radius:22px;">\n                                            <h3 style="margin-bottom:10px;color:white;">${json.label}</h3>\n+                                            <p style="color:var(--gray-200);">${json.message}</p>\n+                                        </div>`;
                                     // scroll to result (account for fixed navbar)
                                     const navbarHeight = document.querySelector('.navbar')?.offsetHeight || 0;
                                     const targetY = resultWrapper.getBoundingClientRect().top + window.pageYOffset - navbarHeight;
                                     window.scrollTo({ top: targetY, behavior: 'smooth' });
                                 } catch (err) {
-                                    resultWrapper.innerHTML = `\n+                                        <div class="card result-box" style="margin-top:28px;padding:24px;border-radius:22px;">\n+                                            <h3 style="margin-bottom:10px;color:white;">Error</h3>\n+                                            <p style="color:var(--gray-200);">Unable to get prediction. Please try again.</p>\n+                                        </div>`;
+                                    resultWrapper.innerHTML = `\n                                        <div class="card result-box" style="margin-top:28px;padding:24px;border-radius:22px;">\n                                            <h3 style="margin-bottom:10px;color:white;">Error</h3>\n+                                            <p style="color:var(--gray-200);">Unable to get prediction. Please try again.</p>\n+                                        </div>`;
                                 }
                             });
                         });
