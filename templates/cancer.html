@@ -51,22 +51,6 @@
                 <p class="hero-subtitle">
                     Provide your demographic and lifestyle details below for a model-based cancer risk estimate.
                 </p>
-                <a href="#cancer-form" class="btn btn-primary">Start Cancer Prediction</a>
-            </div>
-        </div>
-    </section>
-
-    <section class="hero hero-compact" id="hero">
-        <div class="container">
-            <div class="hero-content">
-                <div class="hero-badge">
-                    <span class="pulse-dot"></span>
-                    Cancer Risk Check
-                </div>
-                <h1 class="hero-title">AI-Powered Cancer Prediction</h1>
-                <p class="hero-subtitle">
-                    Provide your demographic and lifestyle details below for a model-based cancer risk estimate.
-                </p>
                 <div class="hero-buttons">
                     <a href="/predict" class="btn btn-secondary">
                         Heart Prediction <span class="btn-icon">→</span>
@@ -195,6 +179,16 @@
                             <p style="color:var(--gray-200);">{{ cancer_result.message }}</p>
                         </div>
                     </div>
+                    <script>
+                        window.addEventListener('DOMContentLoaded', () => {
+                            const formSection = document.getElementById('cancer-form');
+                            if (formSection) {
+                                const navbarHeight = document.querySelector('.navbar')?.offsetHeight || 0;
+                                const targetY = formSection.getBoundingClientRect().top + window.pageYOffset - navbarHeight;
+                                window.scrollTo({ top: targetY, behavior: 'auto' });
+                            }
+                        });
+                    </script>
                     {% endif %}
                 </div>
             </div>
