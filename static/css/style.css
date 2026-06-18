@@ -275,6 +275,12 @@ ul {
     overflow: hidden;
 }
 
+.hero.hero-compact {
+    height: auto;
+    min-height: 420px;
+    padding: 90px 0 50px !important;
+}
+
 .hero-slides {
     position: absolute;
     inset: 0;
