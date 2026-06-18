@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Cancer risk prediction using a trained machine learning model. Enter your demographic and lifestyle inputs for a risk estimate.">
+    <title>Cancer Prediction | MediCare AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">    
+</head>
+<body>
+    <div class="bg-particles" aria-hidden="true">
+        <div class="orb"></div>
+        <div class="orb"></div>
+        <div class="orb"></div>
+    </div>
+
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <a href="/" class="navbar-brand">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MediCare Logo">
+                <span>MediCare</span>
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="/">Home</a></li>
+                <li><a href="/predict">Prediction</a></li>
+                <li><a href="/profile">Profile</a></li>
+                <li><a href="/contact">Contact</a></li>
+                <li><a href="/about">About</a></li>
+            </ul>
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <section class="hero hero-compact" id="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span class="pulse-dot"></span>
+                    Cancer Risk Check
+                </div>
+                <h1 class="hero-title">AI-Powered Cancer Prediction</h1>
+                <p class="hero-subtitle">
+                    Provide your demographic and lifestyle details below for a model-based cancer risk estimate.
+                </p>
+                <a href="#cancer-form" class="btn btn-primary">Start Cancer Prediction</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="services-section" id="cancer-form" style="padding: 80px 0 40px;">
+        <div class="container">
+            <div class="section-header reveal">
+                <div class="section-label">Cancer Prediction</div>
+                <h2 class="section-title">Cancer Risk Assessment</h2>
+                <p class="section-subtitle">
+                    Use the personalized cancer prediction form below. The model uses your answers to estimate risk and save results for your profile.
+                </p>
+            </div>
+
+            <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:32px;">
+                <a href="/predict" class="btn btn-secondary" style="flex:1;min-width:180px;">Heart Disease Page</a>
+                <a href="/profile" class="btn btn-secondary" style="flex:1;min-width:180px;">Profile</a>
+            </div>
+
+            <div class="predict-grid">
+                <div class="predict-panel">
+                    <h3>Instructions</h3>
+                    <ul style="list-style:disc inside;line-height:1.8;color:var(--gray-200);">
+                        {% for item in instructions %}
+                        <li>{{ item }}</li>
+                        {% endfor %}
+                    </ul>
+
+                    <h3 style="margin-top:32px;margin-bottom:16px;color:#fff;">Precautions</h3>
+                    <ul style="list-style:disc inside;line-height:1.8;color:var(--gray-200);">
+                        {% for item in precautions %}
+                        <li>{{ item }}</li>
+                        {% endfor %}
+                    </ul>
+
+                    <div style="margin-top:32px;padding:20px;border-radius:18px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.18);">
+                        <strong>Important:</strong> This tool is not a substitute for professional medical evaluation. Use it only as an informational guide.
+                    </div>
+                </div>
+
+                <div class="predict-panel">
+                    <h3>Enter your cancer prediction details</h3>
+                    <form method="post" action="{{ url_for('cancer') }}#cancer-form" novalidate>
+                        <div style="display:grid;gap:18px;">
+                            <label>
+                                Gender
+                                <select name="gender" required>
+                                    <option value="Female" {% if cancer_form.gender == 'Female' %}selected{% endif %}>Female</option>
+                                    <option value="Male" {% if cancer_form.gender == 'Male' %}selected{% endif %}>Male</option>
+                                </select>
+                            </label>
+                            <label>
+                                Age
+                                <input type="number" name="age" value="{{ cancer_form.age }}" min="1" max="120" placeholder="Age in years" required>
+                            </label>
+                            <label>
+                                Marital Status
+                                <select name="marital_status" required>
+                                    <option value="Married" {% if cancer_form.marital_status == 'Married' %}selected{% endif %}>Married</option>
+                                    <option value="Separated" {% if cancer_form.marital_status == 'Separated' %}selected{% endif %}>Separated</option>
+                                    <option value="Single" {% if cancer_form.marital_status == 'Single' %}selected{% endif %}>Single</option>
+                                    <option value="Widowed" {% if cancer_form.marital_status == 'Widowed' %}selected{% endif %}>Widowed</option>
+                                </select>
+                            </label>
+                            <label>
+                                Children
+                                <input type="number" name="children" value="{{ cancer_form.children }}" min="0" max="10" placeholder="Number of children" required>
+                            </label>
+                            <label>
+                                Smoker
+                                <select name="smoker" required>
+                                    <option value="No" {% if cancer_form.smoker == 'No' %}selected{% endif %}>No</option>
+                                    <option value="Yes" {% if cancer_form.smoker == 'Yes' %}selected{% endif %}>Yes</option>
+                                </select>
+                            </label>
+                            <label>
+                                Employed
+                                <select name="employed" required>
+                                    <option value="No" {% if cancer_form.employed == 'No' %}selected{% endif %}>No</option>
+                                    <option value="Yes" {% if cancer_form.employed == 'Yes' %}selected{% endif %}>Yes</option>
+                                </select>
+                            </label>
+                            <label>
+                                Years Worked
+                                <input type="number" name="years_worked" value="{{ cancer_form.years_worked }}" min="0" max="80" placeholder="Years worked" required>
+                            </label>
+                            <label>
+                                Income Level
+                                <select name="income_level" required>
+                                    <option value="High" {% if cancer_form.income_level == 'High' %}selected{% endif %}>High</option>
+                                    <option value="Low" {% if cancer_form.income_level == 'Low' %}selected{% endif %}>Low</option>
+                                    <option value="Medium" {% if cancer_form.income_level == 'Medium' %}selected{% endif %}>Medium</option>
+                                </select>
+                            </label>
+                            <label>
+                                Social Media
+                                <select name="social_media" required>
+                                    <option value="No" {% if cancer_form.social_media == 'No' %}selected{% endif %}>No</option>
+                                    <option value="Yes" {% if cancer_form.social_media == 'Yes' %}selected{% endif %}>Yes</option>
+                                </select>
+                            </label>
+                            <label>
+                                Online Gaming
+                                <select name="online_gaming" required>
+                                    <option value="No" {% if cancer_form.online_gaming == 'No' %}selected{% endif %}>No</option>
+                                    <option value="Yes" {% if cancer_form.online_gaming == 'Yes' %}selected{% endif %}>Yes</option>
+                                </select>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="margin-top:24px;">Predict Cancer Risk</button>
+                    </form>
+
+                    {% if cancer_result %}
+                    <div id="cancer-prediction-result-wrapper">
+                        <div class="card result-box" style="margin-top:28px;padding:24px;border-radius:22px;">
+                            <h3 style="margin-bottom:10px;color:white;">{{ cancer_result.label }}</h3>
+                            <p style="color:var(--gray-200);">{{ cancer_result.message }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer" id="contact">
+        <div class="container">
+            <div class="footer-grid reveal">
+                <div class="footer-col">
+                    <div class="footer-brand">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MediCare Logo">
+                        <span>MediCare AI</span>
+                    </div>
+                    <p class="footer-about">
+                        AI-powered medical prediction platform providing advanced heart disease and cancer risk
+                        assessments for better health outcomes.
+                    </p>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-heading">Quick Links</h4>
+                    <ul class="footer-nav">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/about">About Us</a></li>
+                        <li><a href="/predict">Heart Prediction</a></li>
+                        <li><a href="/profile">Profile</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-heading">Our Services</h4>
+                    <ul class="footer-nav">
+                        <li><a href="/predict">Heart Disease Prediction</a></li>
+                        <li><a href="/cancer">Cancer Risk Analysis</a></li>
+                        <li><a href="/profile">Health Dashboard</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-heading">Contact Us</h4>
+                    <div class="footer-contact-list">
+                        <div class="footer-contact-item">
+                            <span class="footer-contact-icon">📞</span>
+                            <div>
+                                <p>+91 98765 43210</p>
+                                <p>+91 87654 32109</p>
+                            </div>
+                        </div>
+                        <div class="footer-contact-item">
+                            <span class="footer-contact-icon">✉️</span>
+                            <div>
+                                <p>contact@medicareai.com</p>
+                                <p>support@medicareai.com</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

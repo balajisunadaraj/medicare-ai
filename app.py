@@ -58,6 +58,19 @@ PRECAUTIONS = [
     "Maintain regular checkups, a healthy diet, and consistent exercise for better heart health."
 ]
 
+CANCER_INSTRUCTIONS = [
+    "Provide truthful demographic and lifestyle details for the cancer risk prediction.",
+    "Use the selection fields for encoded values like gender, smoker status, and income level.",
+    "Submit the form to receive an estimate based on the trained cancer model.",
+    "Review results carefully and seek medical advice rather than relying on this prediction alone."
+]
+
+CANCER_PRECAUTIONS = [
+    "A predictive model is not a diagnostic tool; consult a healthcare professional for any concerns.",
+    "Lifestyle factors like smoking, employment, and social habits are included for model estimation.",
+    "Keep follow-up appointments and screenings as recommended by your doctor."
+]
+
 
 def parse_int(value, default=0):
     try:
@@ -77,13 +90,13 @@ def predict_heart_disease(form):
     payload = [
         parse_int(form.get("age", 0)),
         parse_int(form.get("sex", 0)),
-        parse_int(form.get("cp", 0)),
-        parse_int(form.get("trestbps", 0)),
-        parse_int(form.get("chol", 0)),
+        parse_int(form.get("chest_pain", 0)),
+        parse_int(form.get("resting_bp", 0)),
+        parse_int(form.get("cholesterol", 0)),
         parse_int(form.get("fasting_bs", 0)),
         parse_int(form.get("resting_ecg", 0)),
-        parse_int(form.get("thalach", 0)),
-        parse_int(form.get("exang", 0)),
+        parse_int(form.get("max_hr", 0)),
+        parse_int(form.get("exercise_angina", 0)),
         parse_float(form.get("oldpeak", 0.0)),
         parse_int(form.get("st_slope", 0)),
     ]
@@ -345,7 +358,6 @@ def contact():
 @app.route("/predict", methods=["GET", "POST"])
 def predict():
     result = None
-    cancer_result = None
     form = {
         "age": "0",
         "sex": "0",
@@ -359,6 +371,57 @@ def predict():
         "oldpeak": "1.0",
         "st_slope": "0"
     }
+
+    if request.method == "POST":
+        form.update({
+            "age": request.form.get("age", "0"),
+            "sex": request.form.get("sex", "0"),
+            "chest_pain": request.form.get("chest_pain", "0"),
+            "resting_bp": request.form.get("resting_bp", "120"),
+            "cholesterol": request.form.get("cholesterol", "180"),
+            "fasting_bs": request.form.get("fasting_bs", "0"),
+            "resting_ecg": request.form.get("resting_ecg", "0"),
+            "max_hr": request.form.get("max_hr", "130"),
+            "exercise_angina": request.form.get("exercise_angina", "0"),
+            "oldpeak": request.form.get("oldpeak", "1.0"),
+            "st_slope": request.form.get("st_slope", "0")
+        })
+        result = predict_heart_disease(form)
+        record = PredictionRecord(
+            user_id=current_user.id if current_user.is_authenticated else None,
+            age=parse_int(form["age"]),
+            sex=parse_int(form["sex"]),
+            chest_pain=parse_int(form["chest_pain"]),
+            resting_bp=parse_int(form["resting_bp"]),
+            cholesterol=parse_int(form["cholesterol"]),
+            fasting_bs=parse_int(form["fasting_bs"]),
+            resting_ecg=parse_int(form["resting_ecg"]),
+            max_hr=parse_int(form["max_hr"]),
+            exercise_angina=parse_int(form["exercise_angina"]),
+            oldpeak=parse_float(form["oldpeak"]),
+            st_slope=parse_int(form["st_slope"]),
+            prediction=result["label"],
+            message=result["message"],
+            risk_class=result["class"]
+        )
+        db.session.add(record)
+        db.session.commit()
+
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return jsonify(result)
+
+    return render_template(
+        "predict.html",
+        result=result,
+        form=form,
+        instructions=INSTRUCTIONS,
+        precautions=PRECAUTIONS
+    )
+
+
+@app.route("/cancer", methods=["GET", "POST"])
+def cancer():
+    cancer_result = None
     cancer_form = {
         "gender": "Female",
         "age": "0",
@@ -373,86 +436,47 @@ def predict():
     }
 
     if request.method == "POST":
-        prediction_type = request.form.get("prediction_type", "heart")
-        if prediction_type == "cancer":
-            cancer_form.update({
-                "gender": request.form.get("gender", "Female"),
-                "age": request.form.get("age", "0"),
-                "marital_status": request.form.get("marital_status", "Single"),
-                "children": request.form.get("children", "0"),
-                "smoker": request.form.get("smoker", "No"),
-                "employed": request.form.get("employed", "No"),
-                "years_worked": request.form.get("years_worked", "0"),
-                "income_level": request.form.get("income_level", "Low"),
-                "social_media": request.form.get("social_media", "No"),
-                "online_gaming": request.form.get("online_gaming", "No")
-            })
-            cancer_result = predict_cancer(cancer_form)
-            record = CancerPredictionRecord(
-                user_id=current_user.id if current_user.is_authenticated else None,
-                gender=encode_cancer_value(cancer_form["gender"], CANCER_ENCODING["Gender"]),
-                age=parse_int(cancer_form["age"]),
-                marital_status=encode_cancer_value(cancer_form["marital_status"], CANCER_ENCODING["Marital Status"]),
-                children=parse_int(cancer_form["children"]),
-                smoker=encode_cancer_value(cancer_form["smoker"], CANCER_ENCODING["Smoker"]),
-                employed=encode_cancer_value(cancer_form["employed"], CANCER_ENCODING["Employed"]),
-                years_worked=parse_int(cancer_form["years_worked"]),
-                income_level=encode_cancer_value(cancer_form["income_level"], CANCER_ENCODING["Income Level"]),
-                social_media=encode_cancer_value(cancer_form["social_media"], CANCER_ENCODING["Social Media"]),
-                online_gaming=encode_cancer_value(cancer_form["online_gaming"], CANCER_ENCODING["Online Gaming"]),
-                prediction=cancer_result["label"],
-                message=cancer_result["message"],
-                risk_class=cancer_result["class"]
-            )
-            db.session.add(record)
-            db.session.commit()
-            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-                return jsonify(cancer_result)
-        else:
-            form.update({
-                "age": request.form.get("age", "0"),
-                "sex": request.form.get("sex", "0"),
-                "chest_pain": request.form.get("chest_pain", "0"),
-                "resting_bp": request.form.get("resting_bp", "120"),
-                "cholesterol": request.form.get("cholesterol", "180"),
-                "fasting_bs": request.form.get("fasting_bs", "0"),
-                "resting_ecg": request.form.get("resting_ecg", "0"),
-                "max_hr": request.form.get("max_hr", "130"),
-                "exercise_angina": request.form.get("exercise_angina", "0"),
-                "oldpeak": request.form.get("oldpeak", "1.0"),
-                "st_slope": request.form.get("st_slope", "0")
-            })
-            result = predict_heart_disease(form)
-            record = PredictionRecord(
-                user_id=current_user.id if current_user.is_authenticated else None,
-                age=parse_int(form["age"]),
-                sex=parse_int(form["sex"]),
-                chest_pain=parse_int(form["chest_pain"]),
-                resting_bp=parse_int(form["resting_bp"]),
-                cholesterol=parse_int(form["cholesterol"]),
-                fasting_bs=parse_int(form["fasting_bs"]),
-                resting_ecg=parse_int(form["resting_ecg"]),
-                max_hr=parse_int(form["max_hr"]),
-                exercise_angina=parse_int(form["exercise_angina"]),
-                oldpeak=parse_float(form["oldpeak"]),
-                st_slope=parse_int(form["st_slope"]),
-                prediction=result["label"],
-                message=result["message"],
-                risk_class=result["class"]
-            )
-            db.session.add(record)
-            db.session.commit()
-            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-                return jsonify(result)
+        cancer_form.update({
+            "gender": request.form.get("gender", "Female"),
+            "age": request.form.get("age", "0"),
+            "marital_status": request.form.get("marital_status", "Single"),
+            "children": request.form.get("children", "0"),
+            "smoker": request.form.get("smoker", "No"),
+            "employed": request.form.get("employed", "No"),
+            "years_worked": request.form.get("years_worked", "0"),
+            "income_level": request.form.get("income_level", "Low"),
+            "social_media": request.form.get("social_media", "No"),
+            "online_gaming": request.form.get("online_gaming", "No")
+        })
+        cancer_result = predict_cancer(cancer_form)
+        record = CancerPredictionRecord(
+            user_id=current_user.id if current_user.is_authenticated else None,
+            gender=encode_cancer_value(cancer_form["gender"], CANCER_ENCODING["Gender"]),
+            age=parse_int(cancer_form["age"]),
+            marital_status=encode_cancer_value(cancer_form["marital_status"], CANCER_ENCODING["Marital Status"]),
+            children=parse_int(cancer_form["children"]),
+            smoker=encode_cancer_value(cancer_form["smoker"], CANCER_ENCODING["Smoker"]),
+            employed=encode_cancer_value(cancer_form["employed"], CANCER_ENCODING["Employed"]),
+            years_worked=parse_int(cancer_form["years_worked"]),
+            income_level=encode_cancer_value(cancer_form["income_level"], CANCER_ENCODING["Income Level"]),
+            social_media=encode_cancer_value(cancer_form["social_media"], CANCER_ENCODING["Social Media"]),
+            online_gaming=encode_cancer_value(cancer_form["online_gaming"], CANCER_ENCODING["Online Gaming"]),
+            prediction=cancer_result["label"],
+            message=cancer_result["message"],
+            risk_class=cancer_result["class"]
+        )
+        db.session.add(record)
+        db.session.commit()
+
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return jsonify(cancer_result)
 
     return render_template(
-        "predict.html",
-        result=result,
+        "cancer.html",
         cancer_result=cancer_result,
-        form=form,
         cancer_form=cancer_form,
-        instructions=INSTRUCTIONS,
-        precautions=PRECAUTIONS
+        instructions=CANCER_INSTRUCTIONS,
+        precautions=CANCER_PRECAUTIONS
     )
 
 
