@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Cancer risk prediction using a trained machine learning model. Enter your demographic and lifestyle inputs for a risk estimate.">
     <title>Cancer Prediction | MediCare AI</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
 </head>
 <body>
+
     <div class="bg-particles" aria-hidden="true">
         <div class="orb"></div>
         <div class="orb"></div>
@@ -20,13 +22,16 @@
                 <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MediCare Logo">
                 <span>MediCare</span>
             </a>
+
             <ul class="nav-links" id="navLinks">
                 <li><a href="/">Home</a></li>
                 <li><a href="/predict">Prediction</a></li>
+                <li><a href="/cancer" class="active">Cancer</a></li>
                 <li><a href="/profile">Profile</a></li>
                 <li><a href="/contact">Contact</a></li>
                 <li><a href="/about">About</a></li>
             </ul>
+
             <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
                 <span></span>
                 <span></span>
@@ -47,6 +52,29 @@
                     Provide your demographic and lifestyle details below for a model-based cancer risk estimate.
                 </p>
                 <a href="#cancer-form" class="btn btn-primary">Start Cancer Prediction</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="hero hero-compact" id="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span class="pulse-dot"></span>
+                    Cancer Risk Check
+                </div>
+                <h1 class="hero-title">AI-Powered Cancer Prediction</h1>
+                <p class="hero-subtitle">
+                    Provide your demographic and lifestyle details below for a model-based cancer risk estimate.
+                </p>
+                <div class="hero-buttons">
+                    <a href="/predict" class="btn btn-secondary">
+                        Heart Prediction <span class="btn-icon">→</span>
+                    </a>
+                    <a href="#cancer-form" class="btn btn-primary">
+                        Start Cancer Prediction <span class="btn-icon">→</span>
+                    </a>
+                </div>
             </div>
         </div>
     </section>
