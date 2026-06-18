@@ -192,9 +192,25 @@
             {% if predictions %}
             <section class="profile-dashboard-section">
                 <div class="dashboard-card" style="margin-top:32px;">
-                    <h3>Recent Predictions</h3>
+                    <h3>Recent Heart Predictions</h3>
                     <ul style="padding-left:18px; color: var(--gray-200); margin-top:18px;">
                         {% for prediction in predictions %}
+                        <li style="margin-bottom:12px;">
+                            <strong>{{ prediction.created_at.strftime('%Y-%m-%d %H:%M') }}</strong> — {{ prediction.prediction }}<br>
+                            <span style="color: var(--gray-400);">{{ prediction.message }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </section>
+            {% endif %}
+
+            {% if cancer_predictions %}
+            <section class="profile-dashboard-section">
+                <div class="dashboard-card" style="margin-top:32px;">
+                    <h3>Recent Cancer Predictions</h3>
+                    <ul style="padding-left:18px; color: var(--gray-200); margin-top:18px;">
+                        {% for prediction in cancer_predictions %}
                         <li style="margin-bottom:12px;">
                             <strong>{{ prediction.created_at.strftime('%Y-%m-%d %H:%M') }}</strong> — {{ prediction.prediction }}<br>
                             <span style="color: var(--gray-400);">{{ prediction.message }}</span>

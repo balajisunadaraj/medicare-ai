@@ -95,6 +95,7 @@
                 <div class="predict-panel">
                     <h3>Enter your details</h3>
                     <form id="predictForm" method="post" action="{{ url_for('predict') }}#prediction-form" novalidate>
+                        <input type="hidden" name="prediction_type" value="heart">
                         <div style="display:grid;gap:18px;">
                             <label>
                                 Age
@@ -114,7 +115,6 @@
                                     <option value="1" {% if form.chest_pain == '1' %}selected{% endif %}>Atypical Angina</option>
                                     <option value="2" {% if form.chest_pain == '2' %}selected{% endif %}>Non-anginal Pain</option>
                                     <option value="3" {% if form.chest_pain == '3' %}selected{% endif %}>Typical Angina</option>
-        
                                 </select>
                             </label>
                             <label>
@@ -138,7 +138,6 @@
                                     <option value="0" {% if form.resting_ecg == '0' %}selected{% endif %}>Left ventricular hypertrophy</option>
                                     <option value="1" {% if form.resting_ecg == '1' %}selected{% endif %}>Normal</option>
                                     <option value="2" {% if form.resting_ecg == '2' %}selected{% endif %}>ST-T wave abnormality</option>
-                                    
                                 </select>
                             </label>
                             <label>
@@ -162,13 +161,11 @@
                                     <option value="0" {% if form.st_slope == '0' %}selected{% endif %}>Downsloping</option>
                                     <option value="1" {% if form.st_slope == '1' %}selected{% endif %}>Flat</option>
                                     <option value="2" {% if form.st_slope == '2' %}selected{% endif %}>Upsloping</option>
-                                    
-                                    
                                 </select>
                             </label>
                         </div>
 
-                        <button type="submit" class="btn btn-primary" style="margin-top:24px;">Predict Now</button>
+                        <button type="submit" class="btn btn-primary" style="margin-top:24px;">Predict Heart Risk</button>
                     </form>
 
                     {% if result %}
@@ -181,6 +178,90 @@
                     {% else %}
                     <div id="prediction-result-wrapper"></div>
                     {% endif %}
+
+                    <div style="margin-top:48px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.08);">
+                        <h3>Cancer Risk Prediction</h3>
+                        <p style="color:var(--gray-200);margin-bottom:20px;">Use the cancer predictor below to estimate risk based on demographic and lifestyle inputs.</p>
+                        <form id="cancerPredictForm" method="post" action="{{ url_for('predict') }}#prediction-form" novalidate>
+                            <input type="hidden" name="prediction_type" value="cancer">
+                            <div style="display:grid;gap:18px;">
+                                <label>
+                                    Gender
+                                    <select name="gender" required>
+                                        <option value="Female" {% if cancer_form.gender == 'Female' %}selected{% endif %}>Female</option>
+                                        <option value="Male" {% if cancer_form.gender == 'Male' %}selected{% endif %}>Male</option>
+                                    </select>
+                                </label>
+                                <label>
+                                    Age
+                                    <input type="number" name="age" value="{{ cancer_form.age }}" min="1" max="120" placeholder="Age in years" required>
+                                </label>
+                                <label>
+                                    Marital Status
+                                    <select name="marital_status" required>
+                                        <option value="Married" {% if cancer_form.marital_status == 'Married' %}selected{% endif %}>Married</option>
+                                        <option value="Separated" {% if cancer_form.marital_status == 'Separated' %}selected{% endif %}>Separated</option>
+                                        <option value="Single" {% if cancer_form.marital_status == 'Single' %}selected{% endif %}>Single</option>
+                                        <option value="Widowed" {% if cancer_form.marital_status == 'Widowed' %}selected{% endif %}>Widowed</option>
+                                    </select>
+                                </label>
+                                <label>
+                                    Children
+                                    <input type="number" name="children" value="{{ cancer_form.children }}" min="0" max="10" placeholder="Number of children" required>
+                                </label>
+                                <label>
+                                    Smoker
+                                    <select name="smoker" required>
+                                        <option value="No" {% if cancer_form.smoker == 'No' %}selected{% endif %}>No</option>
+                                        <option value="Yes" {% if cancer_form.smoker == 'Yes' %}selected{% endif %}>Yes</option>
+                                    </select>
+                                </label>
+                                <label>
+                                    Employed
+                                    <select name="employed" required>
+                                        <option value="No" {% if cancer_form.employed == 'No' %}selected{% endif %}>No</option>
+                                        <option value="Yes" {% if cancer_form.employed == 'Yes' %}selected{% endif %}>Yes</option>
+                                    </select>
+                                </label>
+                                <label>
+                                    Years Worked
+                                    <input type="number" name="years_worked" value="{{ cancer_form.years_worked }}" min="0" max="80" placeholder="Years worked" required>
+                                </label>
+                                <label>
+                                    Income Level
+                                    <select name="income_level" required>
+                                        <option value="High" {% if cancer_form.income_level == 'High' %}selected{% endif %}>High</option>
+                                        <option value="Low" {% if cancer_form.income_level == 'Low' %}selected{% endif %}>Low</option>
+                                        <option value="Medium" {% if cancer_form.income_level == 'Medium' %}selected{% endif %}>Medium</option>
+                                    </select>
+                                </label>
+                                <label>
+                                    Social Media
+                                    <select name="social_media" required>
+                                        <option value="No" {% if cancer_form.social_media == 'No' %}selected{% endif %}>No</option>
+                                        <option value="Yes" {% if cancer_form.social_media == 'Yes' %}selected{% endif %}>Yes</option>
+                                    </select>
+                                </label>
+                                <label>
+                                    Online Gaming
+                                    <select name="online_gaming" required>
+                                        <option value="No" {% if cancer_form.online_gaming == 'No' %}selected{% endif %}>No</option>
+                                        <option value="Yes" {% if cancer_form.online_gaming == 'Yes' %}selected{% endif %}>Yes</option>
+                                    </select>
+                                </label>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="margin-top:24px;">Predict Cancer Risk</button>
+                        </form>
+
+                        {% if cancer_result %}
+                        <div id="cancer-prediction-result-wrapper">
+                            <div class="card result-box" style="margin-top:28px;padding:24px;border-radius:22px;">
+                                <h3 style="margin-bottom:10px;color:white;">{{ cancer_result.label }}</h3>
+                                <p style="color:var(--gray-200);">{{ cancer_result.message }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
