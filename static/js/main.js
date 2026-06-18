@@ -16,13 +16,16 @@ function initNavbar() {
     const navLinks = document.querySelector('.nav-links');
 
     // Scroll behavior
-    window.addEventListener('scroll', () => {
+    const updateNavbar = () => {
         if (window.scrollY > 60) {
             navbar.classList.add('scrolled');
         } else {
             navbar.classList.remove('scrolled');
         }
-    });
+    };
+
+    window.addEventListener('scroll', updateNavbar);
+    updateNavbar();
 
     // Mobile toggle
     if (navToggle) {
