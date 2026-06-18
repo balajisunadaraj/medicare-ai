@@ -8,7 +8,7 @@ from database import db, init_db
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask("Medicare")
-app.secret_key = "your-secret-key-change-this"
+app.secret_key = "Medicare-ai@123#"
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{os.path.join(basedir, 'medicare.db')}"
