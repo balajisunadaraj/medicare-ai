@@ -101,6 +101,10 @@
                     <form id="cancerForm" method="post" action="{{ url_for('cancer') }}" novalidate>
                         <div style="display:grid;gap:18px;">
                             <label>
+                                Age
+                                <input type="number" name="age" value="{{ cancer_form.age }}" min="18" max="100" placeholder="Age in years" required>
+                            </label>
+                            <label>
                                 Gender
                                 <select name="gender" required>
                                     <option value="Female" {% if cancer_form.gender == 'Female' %}selected{% endif %}>Female</option>
@@ -108,60 +112,37 @@
                                 </select>
                             </label>
                             <label>
-                                Age
-                                <input type="number" name="age" value="{{ cancer_form.age }}" min="1" max="120" placeholder="Age in years" required>
+                                BMI
+                                <input type="number" name="bmi" value="{{ cancer_form.bmi }}" min="10" max="60" step="0.1" placeholder="Body Mass Index" required>
                             </label>
                             <label>
-                                Marital Status
-                                <select name="marital_status" required>
-                                    <option value="Married" {% if cancer_form.marital_status == 'Married' %}selected{% endif %}>Married</option>
-                                    <option value="Separated" {% if cancer_form.marital_status == 'Separated' %}selected{% endif %}>Separated</option>
-                                    <option value="Single" {% if cancer_form.marital_status == 'Single' %}selected{% endif %}>Single</option>
-                                    <option value="Widowed" {% if cancer_form.marital_status == 'Widowed' %}selected{% endif %}>Widowed</option>
+                                Smoking
+                                <select name="smoking" required>
+                                    <option value="No" {% if cancer_form.smoking == 'No' %}selected{% endif %}>No</option>
+                                    <option value="Yes" {% if cancer_form.smoking == 'Yes' %}selected{% endif %}>Yes</option>
                                 </select>
                             </label>
                             <label>
-                                Children
-                                <input type="number" name="children" value="{{ cancer_form.children }}" min="0" max="10" placeholder="Number of children" required>
-                            </label>
-                            <label>
-                                Smoker
-                                <select name="smoker" required>
-                                    <option value="No" {% if cancer_form.smoker == 'No' %}selected{% endif %}>No</option>
-                                    <option value="Yes" {% if cancer_form.smoker == 'Yes' %}selected{% endif %}>Yes</option>
+                                Genetic Risk
+                                <select name="genetic_risk" required>
+                                    <option value="Low" {% if cancer_form.genetic_risk == 'Low' %}selected{% endif %}>Low</option>
+                                    <option value="Medium" {% if cancer_form.genetic_risk == 'Medium' %}selected{% endif %}>Medium</option>
+                                    <option value="High" {% if cancer_form.genetic_risk == 'High' %}selected{% endif %}>High</option>
                                 </select>
                             </label>
                             <label>
-                                Employed
-                                <select name="employed" required>
-                                    <option value="No" {% if cancer_form.employed == 'No' %}selected{% endif %}>No</option>
-                                    <option value="Yes" {% if cancer_form.employed == 'Yes' %}selected{% endif %}>Yes</option>
-                                </select>
+                                Physical Activity
+                                <input type="number" name="physical_activity" value="{{ cancer_form.physical_activity }}" min="0" max="20" step="0.1" placeholder="Physical activity score" required>
                             </label>
                             <label>
-                                Years Worked
-                                <input type="number" name="years_worked" value="{{ cancer_form.years_worked }}" min="0" max="80" placeholder="Years worked" required>
+                                Alcohol Intake
+                                <input type="number" name="alcohol_intake" value="{{ cancer_form.alcohol_intake }}" min="0" max="10" step="0.1" placeholder="Alcohol intake score" required>
                             </label>
                             <label>
-                                Income Level
-                                <select name="income_level" required>
-                                    <option value="High" {% if cancer_form.income_level == 'High' %}selected{% endif %}>High</option>
-                                    <option value="Low" {% if cancer_form.income_level == 'Low' %}selected{% endif %}>Low</option>
-                                    <option value="Medium" {% if cancer_form.income_level == 'Medium' %}selected{% endif %}>Medium</option>
-                                </select>
-                            </label>
-                            <label>
-                                Social Media
-                                <select name="social_media" required>
-                                    <option value="No" {% if cancer_form.social_media == 'No' %}selected{% endif %}>No</option>
-                                    <option value="Yes" {% if cancer_form.social_media == 'Yes' %}selected{% endif %}>Yes</option>
-                                </select>
-                            </label>
-                            <label>
-                                Online Gaming
-                                <select name="online_gaming" required>
-                                    <option value="No" {% if cancer_form.online_gaming == 'No' %}selected{% endif %}>No</option>
-                                    <option value="Yes" {% if cancer_form.online_gaming == 'Yes' %}selected{% endif %}>Yes</option>
+                                Cancer History
+                                <select name="cancer_history" required>
+                                    <option value="No" {% if cancer_form.cancer_history == 'No' %}selected{% endif %}>No</option>
+                                    <option value="Yes" {% if cancer_form.cancer_history == 'Yes' %}selected{% endif %}>Yes</option>
                                 </select>
                             </label>
                         </div>

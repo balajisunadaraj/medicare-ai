@@ -208,12 +208,9 @@ def build_health_dashboard(form):
 
 CANCER_ENCODING = {
     "Gender": {"Female": 0, "Male": 1},
-    "Marital Status": {"Married": 0, "Separated": 1, "Single": 2, "Widowed": 3},
-    "Smoker": {"No": 0, "Yes": 1},
-    "Employed": {"No": 0, "Yes": 1},
-    "Income Level": {"High": 0, "Low": 1, "Medium": 2},
-    "Social Media": {"No": 0, "Yes": 1},
-    "Online Gaming": {"No": 0, "Yes": 1}
+    "Smoking": {"No": 0, "Yes": 1},
+    "GeneticRisk": {"Low": 0, "Medium": 1, "High": 2},
+    "CancerHistory": {"No": 0, "Yes": 1}
 }
 
 
@@ -233,14 +230,12 @@ def predict_cancer(form):
     payload = [
         encode_cancer_value(form.get("gender", "Female"), CANCER_ENCODING["Gender"]),
         parse_int(form.get("age", 0)),
-        encode_cancer_value(form.get("marital_status", "Single"), CANCER_ENCODING["Marital Status"]),
-        parse_int(form.get("children", 0)),
-        encode_cancer_value(form.get("smoker", "No"), CANCER_ENCODING["Smoker"]),
-        encode_cancer_value(form.get("employed", "No"), CANCER_ENCODING["Employed"]),
-        parse_int(form.get("years_worked", 0)),
-        encode_cancer_value(form.get("income_level", "Low"), CANCER_ENCODING["Income Level"]),
-        encode_cancer_value(form.get("social_media", "No"), CANCER_ENCODING["Social Media"]),
-        encode_cancer_value(form.get("online_gaming", "No"), CANCER_ENCODING["Online Gaming"])
+        float(form.get("bmi", 0.0)),
+        encode_cancer_value(form.get("smoking", "No"), CANCER_ENCODING["Smoking"]),
+        encode_cancer_value(form.get("genetic_risk", "Medium"), CANCER_ENCODING["GeneticRisk"]),
+        float(form.get("physical_activity", 0.0)),
+        float(form.get("alcohol_intake", 0.0)),
+        encode_cancer_value(form.get("cancer_history", "No"), CANCER_ENCODING["CancerHistory"])
     ]
 
     if cancer_model is not None:
@@ -314,14 +309,12 @@ class CancerPredictionRecord(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     gender = db.Column(db.Integer, nullable=False)
     age = db.Column(db.Integer, nullable=False)
-    marital_status = db.Column(db.Integer, nullable=False)
-    children = db.Column(db.Integer, nullable=False)
-    smoker = db.Column(db.Integer, nullable=False)
-    employed = db.Column(db.Integer, nullable=False)
-    years_worked = db.Column(db.Integer, nullable=False)
-    income_level = db.Column(db.Integer, nullable=False)
-    social_media = db.Column(db.Integer, nullable=False)
-    online_gaming = db.Column(db.Integer, nullable=False)
+    bmi = db.Column(db.Float, nullable=False)
+    smoking = db.Column(db.Integer, nullable=False)
+    genetic_risk = db.Column(db.Integer, nullable=False)
+    physical_activity = db.Column(db.Float, nullable=False)
+    alcohol_intake = db.Column(db.Float, nullable=False)
+    cancer_history = db.Column(db.Integer, nullable=False)
     prediction = db.Column(db.String(64), nullable=False)
     message = db.Column(db.String(256), nullable=False)
     risk_class = db.Column(db.String(32), nullable=False)
@@ -425,42 +418,36 @@ def cancer():
     cancer_form = {
         "gender": "Female",
         "age": "0",
-        "marital_status": "Single",
-        "children": "0",
-        "smoker": "No",
-        "employed": "No",
-        "years_worked": "0",
-        "income_level": "Low",
-        "social_media": "No",
-        "online_gaming": "No"
+        "bmi": "25.0",
+        "smoking": "No",
+        "genetic_risk": "Medium",
+        "physical_activity": "5.0",
+        "alcohol_intake": "2.0",
+        "cancer_history": "No"
     }
 
     if request.method == "POST":
         cancer_form.update({
             "gender": request.form.get("gender", "Female"),
             "age": request.form.get("age", "0"),
-            "marital_status": request.form.get("marital_status", "Single"),
-            "children": request.form.get("children", "0"),
-            "smoker": request.form.get("smoker", "No"),
-            "employed": request.form.get("employed", "No"),
-            "years_worked": request.form.get("years_worked", "0"),
-            "income_level": request.form.get("income_level", "Low"),
-            "social_media": request.form.get("social_media", "No"),
-            "online_gaming": request.form.get("online_gaming", "No")
+            "bmi": request.form.get("bmi", "25.0"),
+            "smoking": request.form.get("smoking", "No"),
+            "genetic_risk": request.form.get("genetic_risk", "Medium"),
+            "physical_activity": request.form.get("physical_activity", "5.0"),
+            "alcohol_intake": request.form.get("alcohol_intake", "2.0"),
+            "cancer_history": request.form.get("cancer_history", "No")
         })
         cancer_result = predict_cancer(cancer_form)
         record = CancerPredictionRecord(
             user_id=current_user.id if current_user.is_authenticated else None,
             gender=encode_cancer_value(cancer_form["gender"], CANCER_ENCODING["Gender"]),
             age=parse_int(cancer_form["age"]),
-            marital_status=encode_cancer_value(cancer_form["marital_status"], CANCER_ENCODING["Marital Status"]),
-            children=parse_int(cancer_form["children"]),
-            smoker=encode_cancer_value(cancer_form["smoker"], CANCER_ENCODING["Smoker"]),
-            employed=encode_cancer_value(cancer_form["employed"], CANCER_ENCODING["Employed"]),
-            years_worked=parse_int(cancer_form["years_worked"]),
-            income_level=encode_cancer_value(cancer_form["income_level"], CANCER_ENCODING["Income Level"]),
-            social_media=encode_cancer_value(cancer_form["social_media"], CANCER_ENCODING["Social Media"]),
-            online_gaming=encode_cancer_value(cancer_form["online_gaming"], CANCER_ENCODING["Online Gaming"]),
+            bmi=parse_float(cancer_form["bmi"]),
+            smoking=encode_cancer_value(cancer_form["smoking"], CANCER_ENCODING["Smoking"]),
+            genetic_risk=encode_cancer_value(cancer_form["genetic_risk"], CANCER_ENCODING["GeneticRisk"]),
+            physical_activity=parse_float(cancer_form["physical_activity"]),
+            alcohol_intake=parse_float(cancer_form["alcohol_intake"]),
+            cancer_history=encode_cancer_value(cancer_form["cancer_history"], CANCER_ENCODING["CancerHistory"]),
             prediction=cancer_result["label"],
             message=cancer_result["message"],
             risk_class=cancer_result["class"]

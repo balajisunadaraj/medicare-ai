@@ -2,27 +2,23 @@ import pandas as pd
 import warnings
 warnings.filterwarnings('ignore')
 
-df=pd.read_csv("Cancer_prediction_dataset.csv")
+df=pd.read_csv("The_Cancer_data_1500_V2.csv")
 
 mv1 = df.isnull().sum()
 print(mv1)
 
-df = df.drop(columns=['ID'])
-
-
 from sklearn.preprocessing import LabelEncoder
-categorical_cols = ['Gender', 'Marital Status', 'Smoker', 'Employed', 'Income Level', 'Social Media', 'Online Gaming']
+categorical_cols = ['Age', 'Gender', 'BMI', 'Smoking', 'GeneticRisk', 'PhysicalActivity', 'AlcoholIntake', 'CancerHistory']
 for col in categorical_cols:
     le = LabelEncoder()
     df[col] = le.fit_transform(df[col].astype(str))
 print(df.dtypes)
 
-
 from sklearn.model_selection import train_test_split
 print("\tData splitting")
-x = df.drop('Cancer', axis = 1)
+x = df.drop('Diagnosis', axis=1)
 print(x)
-y = df['Cancer']  
+y = df['Diagnosis']  
 print(y)
 print('train test splitting')
 x_train, x_test,y_train, y_test = train_test_split(x,y,test_size=0.2)
@@ -86,22 +82,20 @@ with open('model.pkl','wb') as file:
     pickle.dump(cancer_best_model, file)
 with open('model.pkl','rb') as file:
     loaded_model=pickle.load(file)
-a=float(input("enter Gender:"))
-b=float(input("enter Age:"))
-c=float(input("enter Marital Status:"))
-d=float(input("enter Children:"))
-e=float(input("enter Smoker:"))
-f=float(input("enter Employed:"))
-g=float(input("enter Years Worked:"))
-h=float(input("enter Income Level:"))
-i=float(input("enter Social Media:"))
-j=float(input("enter Online Games:"))
-final=[[a,b,c,d,e,f,g,h,i,j]]
+a=float(input("enter Age:"))
+b=float(input("enter Gender:"))
+c=float(input("enter BMI:"))
+d=float(input("enter Smoking:"))
+e=float(input("enter GeneticRisk:"))
+f=float(input("enter PhysicalActivity:"))
+g=float(input("enter AlcoholIntake:"))
+h=float(input("enter CancerHistory:"))
+final=[[a,b,c,d,e,f,g,h]]
 prediction = loaded_model.predict(final)
 print(prediction)
 
 print("Best model accuracy")
 
-result=[[a,b,c,d,e,f,g,h,i,j]]
+result=[[a,b,c,d,e,f,g,h]]
 best_mod = loaded_model.predict(result)
 print(best_mod)
