@@ -241,43 +241,55 @@ def predict_cancer(form):
     payload = [
         encode_cancer_value(form.get("gender", "Female"), CANCER_ENCODING["Gender"]),
         parse_int(form.get("age", 0)),
-        float(form.get("bmi", 0.0)),
+        parse_float(form.get("bmi", 0.0)),
         encode_cancer_value(form.get("smoking", "No"), CANCER_ENCODING["Smoking"]),
         encode_cancer_value(form.get("genetic_risk", "Medium"), CANCER_ENCODING["GeneticRisk"]),
-        float(form.get("physical_activity", 0.0)),
-        float(form.get("alcohol_intake", 0.0)),
+        parse_float(form.get("physical_activity", 0.0)),
+        parse_float(form.get("alcohol_intake", 0.0)),
         encode_cancer_value(form.get("cancer_history", "No"), CANCER_ENCODING["CancerHistory"])
     ]
 
+    risk_prob = 50
+    no_risk_prob = 50
+
     if cancer_model is not None:
-        prediction = cancer_model.predict([payload])
         try:
-            prob = cancer_model.predict_proba([payload])[0]
-            risk_prob = int(prob[1] * 100) if len(prob) > 1 else 50
-            no_risk_prob = 100 - risk_prob
-        except:
-            risk_prob = 50
-            no_risk_prob = 50
-        
-        pred_label = str(prediction[0])
-        if pred_label.lower() in ["yes", "1", "true"]:
+            prediction = cancer_model.predict([payload])
+            try:
+                prob = cancer_model.predict_proba([payload])[0]
+                risk_prob = int(prob[1] * 100) if len(prob) > 1 else 50
+                no_risk_prob = 100 - risk_prob
+            except Exception:
+                risk_prob = 50
+                no_risk_prob = 50
+            
+            pred_label = str(prediction[0])
+            if pred_label.lower() in ["yes", "1", "true"]:
+                return {
+                    "label": "Cancer Risk Detected",
+                    "message": "The model predicts a possible cancer risk. Please consult a qualified healthcare professional.",
+                    "class": "risk-high",
+                    "probability": {"risk": risk_prob, "no_risk": no_risk_prob}
+                }
             return {
-                "label": "Cancer Risk Detected",
-                "message": "The model predicts a possible cancer risk. Please consult a qualified healthcare professional.",
-                "class": "risk-high",
+                "label": "No Cancer Detected",
+                "message": "The model predicts a low cancer risk based on the provided inputs.",
+                "class": "risk-low",
                 "probability": {"risk": risk_prob, "no_risk": no_risk_prob}
             }
-        return {
-            "label": "No Cancer Detected",
-            "message": "The model predicts a low cancer risk based on the provided inputs.",
-            "class": "risk-low",
-            "probability": {"risk": risk_prob, "no_risk": no_risk_prob}
-        }
+        except Exception as e:
+            return {
+                "label": "Prediction Error",
+                "message": f"An error occurred during prediction: {str(e)}",
+                "class": "risk-medium",
+                "probability": {"risk": 50, "no_risk": 50}
+            }
 
     return {
         "label": "Cancer model unavailable",
         "message": "No cancer model file was found. Place cancer_best_model.pkl in the project root to enable cancer risk prediction.",
-        "class": "risk-medium"
+        "class": "risk-medium",
+        "probability": {"risk": 50, "no_risk": 50}
     }
 
 
@@ -392,42 +404,59 @@ def predict_heart():
     }
 
     if request.method == "POST":
-        form.update({
-            "age": request.form.get("age", "0"),
-            "sex": request.form.get("sex", "0"),
-            "chest_pain": request.form.get("chest_pain", "0"),
-            "resting_bp": request.form.get("resting_bp", "120"),
-            "cholesterol": request.form.get("cholesterol", "180"),
-            "fasting_bs": request.form.get("fasting_bs", "0"),
-            "resting_ecg": request.form.get("resting_ecg", "0"),
-            "max_hr": request.form.get("max_hr", "130"),
-            "exercise_angina": request.form.get("exercise_angina", "0"),
-            "oldpeak": request.form.get("oldpeak", "1.0"),
-            "st_slope": request.form.get("st_slope", "0")
-        })
-        result = predict_heart_disease(form)
-        record = PredictionRecord(
-            user_id=current_user.id if current_user.is_authenticated else None,
-            age=parse_int(form["age"]),
-            sex=parse_int(form["sex"]),
-            chest_pain=parse_int(form["chest_pain"]),
-            resting_bp=parse_int(form["resting_bp"]),
-            cholesterol=parse_int(form["cholesterol"]),
-            fasting_bs=parse_int(form["fasting_bs"]),
-            resting_ecg=parse_int(form["resting_ecg"]),
-            max_hr=parse_int(form["max_hr"]),
-            exercise_angina=parse_int(form["exercise_angina"]),
-            oldpeak=parse_float(form["oldpeak"]),
-            st_slope=parse_int(form["st_slope"]),
-            prediction=result["label"],
-            message=result["message"],
-            risk_class=result["class"]
-        )
-        db.session.add(record)
-        db.session.commit()
-
-        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-            return jsonify(result)
+        try:
+            form.update({
+                "age": request.form.get("age", "0"),
+                "sex": request.form.get("sex", "0"),
+                "chest_pain": request.form.get("chest_pain", "0"),
+                "resting_bp": request.form.get("resting_bp", "120"),
+                "cholesterol": request.form.get("cholesterol", "180"),
+                "fasting_bs": request.form.get("fasting_bs", "0"),
+                "resting_ecg": request.form.get("resting_ecg", "0"),
+                "max_hr": request.form.get("max_hr", "130"),
+                "exercise_angina": request.form.get("exercise_angina", "0"),
+                "oldpeak": request.form.get("oldpeak", "1.0"),
+                "st_slope": request.form.get("st_slope", "0")
+            })
+            result = predict_heart_disease(form)
+            
+            # Handle AJAX requests first
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return jsonify(result)
+            
+            # Persist prediction to database
+            try:
+                record = PredictionRecord(
+                    user_id=current_user.id if current_user.is_authenticated else None,
+                    age=parse_int(form["age"]),
+                    sex=parse_int(form["sex"]),
+                    chest_pain=parse_int(form["chest_pain"]),
+                    resting_bp=parse_int(form["resting_bp"]),
+                    cholesterol=parse_int(form["cholesterol"]),
+                    fasting_bs=parse_int(form["fasting_bs"]),
+                    resting_ecg=parse_int(form["resting_ecg"]),
+                    max_hr=parse_int(form["max_hr"]),
+                    exercise_angina=parse_int(form["exercise_angina"]),
+                    oldpeak=parse_float(form["oldpeak"]),
+                    st_slope=parse_int(form["st_slope"]),
+                    prediction=result.get("label", "Unknown"),
+                    message=result.get("message", ""),
+                    risk_class=result.get("class", "risk-medium")
+                )
+                db.session.add(record)
+                db.session.commit()
+            except Exception as db_error:
+                db.session.rollback()
+                print(f"Database error saving heart prediction: {str(db_error)}")
+        except Exception as e:
+            result = {
+                "label": "Error",
+                "message": f"An error occurred: {str(e)}",
+                "class": "risk-medium",
+                "probability": {"risk": 50, "no_risk": 50}
+            }
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return jsonify(result)
 
     return render_template(
         "predict_heart.html",
@@ -453,36 +482,61 @@ def cancer():
     }
 
     if request.method == "POST":
-        cancer_form.update({
-            "gender": request.form.get("gender", "Female"),
-            "age": request.form.get("age", "0"),
-            "bmi": request.form.get("bmi", "25.0"),
-            "smoking": request.form.get("smoking", "No"),
-            "genetic_risk": request.form.get("genetic_risk", "Medium"),
-            "physical_activity": request.form.get("physical_activity", "5.0"),
-            "alcohol_intake": request.form.get("alcohol_intake", "2.0"),
-            "cancer_history": request.form.get("cancer_history", "No")
-        })
-        cancer_result = predict_cancer(cancer_form)
-        record = CancerPredictionRecord(
-            user_id=current_user.id if current_user.is_authenticated else None,
-            gender=encode_cancer_value(cancer_form["gender"], CANCER_ENCODING["Gender"]),
-            age=parse_int(cancer_form["age"]),
-            bmi=parse_float(cancer_form["bmi"]),
-            smoking=encode_cancer_value(cancer_form["smoking"], CANCER_ENCODING["Smoking"]),
-            genetic_risk=encode_cancer_value(cancer_form["genetic_risk"], CANCER_ENCODING["GeneticRisk"]),
-            physical_activity=parse_float(cancer_form["physical_activity"]),
-            alcohol_intake=parse_float(cancer_form["alcohol_intake"]),
-            cancer_history=encode_cancer_value(cancer_form["cancer_history"], CANCER_ENCODING["CancerHistory"]),
-            prediction=cancer_result["label"],
-            message=cancer_result["message"],
-            risk_class=cancer_result["class"]
-        )
-        db.session.add(record)
-        db.session.commit()
+        try:
+            cancer_form.update({
+                "gender": request.form.get("gender", "Female"),
+                "age": request.form.get("age", "0"),
+                "bmi": request.form.get("bmi", "25.0"),
+                "smoking": request.form.get("smoking", "No"),
+                "genetic_risk": request.form.get("genetic_risk", "Medium"),
+                "physical_activity": request.form.get("physical_activity", "5.0"),
+                "alcohol_intake": request.form.get("alcohol_intake", "2.0"),
+                "cancer_history": request.form.get("cancer_history", "No")
+            })
+            cancer_result = predict_cancer(cancer_form)
+            
+            # Handle AJAX requests first
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return jsonify(cancer_result)
+            
+            # Persist prediction to database
+            try:
+                record = CancerPredictionRecord(
+                    user_id=current_user.id if current_user.is_authenticated else None,
+                    gender=encode_cancer_value(cancer_form["gender"], CANCER_ENCODING["Gender"]),
+                    age=parse_int(cancer_form["age"]),
+                    bmi=parse_float(cancer_form["bmi"]),
+                    smoking=encode_cancer_value(cancer_form["smoking"], CANCER_ENCODING["Smoking"]),
+                    genetic_risk=encode_cancer_value(cancer_form["genetic_risk"], CANCER_ENCODING["GeneticRisk"]),
+                    physical_activity=parse_float(cancer_form["physical_activity"]),
+                    alcohol_intake=parse_float(cancer_form["alcohol_intake"]),
+                    cancer_history=encode_cancer_value(cancer_form["cancer_history"], CANCER_ENCODING["CancerHistory"]),
+                    prediction=cancer_result.get("label", "Unknown"),
+                    message=cancer_result.get("message", ""),
+                    risk_class=cancer_result.get("class", "risk-medium")
+                )
+                db.session.add(record)
+                db.session.commit()
+            except Exception as db_error:
+                db.session.rollback()
+                print(f"Database error saving cancer prediction: {str(db_error)}")
+        except Exception as e:
+            cancer_result = {
+                "label": "Error",
+                "message": f"An error occurred: {str(e)}",
+                "class": "risk-medium",
+                "probability": {"risk": 50, "no_risk": 50}
+            }
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return jsonify(cancer_result)
 
-        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-            return jsonify(cancer_result)
+    return render_template(
+        "cancer.html",
+        cancer_result=cancer_result,
+        cancer_form=cancer_form,
+        instructions=CANCER_INSTRUCTIONS,
+        precautions=CANCER_PRECAUTIONS
+    )
 
     return render_template(
         "cancer.html",
