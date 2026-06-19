@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Choose your prediction type - Heart Disease or Cancer risk assessment using AI-driven models.">
+    <title>AI Predictions | MediCare AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="bg-particles" aria-hidden="true">
+        <div class="orb"></div>
+        <div class="orb"></div>
+        <div class="orb"></div>
+    </div>
+
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <a href="/" class="navbar-brand">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MediCare Logo">
+                <span>MediCare</span>
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="/">Home</a></li>
+                <li><a href="/predict" class="active">Prediction</a></li>
+                <li><a href="/profile">Profile</a></li>
+                <li><a href="/contact">Contact</a></li>
+                <li><a href="/about">About</a></li>
+            </ul>
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <section class="hero" id="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span class="pulse-dot"></span>
+                    Medical Risk Assessment
+                </div>
+                <h1 class="hero-title">AI-Powered Health Predictions</h1>
+                <p class="hero-subtitle">
+                    Select your prediction type below to assess your risk for heart disease or cancer using advanced machine learning models trained on real medical data.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="services-section" id="prediction-types" style="padding: 80px 0 40px;">
+        <div class="container">
+            <div class="section-header reveal">
+                <div class="section-label">Choose Your Assessment</div>
+                <h2 class="section-title">Select Prediction Type</h2>
+                <p class="section-subtitle">
+                    Both assessments are non-invasive and use your personal health metrics to estimate risk. Always consult a healthcare professional for medical decisions.
+                </p>
+            </div>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:32px;margin-top:48px;">
+                <!-- Heart Disease Card -->
+                <div class="card" style="padding:40px;border-radius:20px;border:2px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.05);display:flex;flex-direction:column;justify-content:space-between;min-height:400px;">
+                    <div>
+                        <div style="font-size:48px;margin-bottom:20px;">❤️</div>
+                        <h3 style="color:#fff;margin-bottom:16px;font-size:24px;">Heart Disease Prediction</h3>
+                        <p style="color:var(--gray-200);line-height:1.6;margin-bottom:24px;">
+                            Assess your cardiovascular risk using 11 health metrics including blood pressure, cholesterol, heart rate, and ECG data. The model predicts the likelihood of heart disease presence.
+                        </p>
+                        <div style="background:rgba(239,68,68,0.1);border-left:4px solid rgb(239,68,68);padding:16px;border-radius:8px;">
+                            <p style="color:var(--gray-300);font-size:14px;margin:0;"><strong>Time Required:</strong> 2-3 minutes</p>
+                        </div>
+                    </div>
+                    <a href="/predict_heart" class="btn btn-primary" style="margin-top:32px;display:block;text-align:center;padding:14px 28px;">
+                        Start Heart Assessment →
+                    </a>
+                </div>
+
+                <!-- Cancer Card -->
+                <div class="card" style="padding:40px;border-radius:20px;border:2px solid rgba(244,114,182,0.3);background:rgba(244,114,182,0.05);display:flex;flex-direction:column;justify-content:space-between;min-height:400px;">
+                    <div>
+                        <div style="font-size:48px;margin-bottom:20px;">🧬</div>
+                        <h3 style="color:#fff;margin-bottom:16px;font-size:24px;">Cancer Risk Prediction</h3>
+                        <p style="color:var(--gray-200);line-height:1.6;margin-bottom:24px;">
+                            Evaluate your cancer risk based on 8 lifestyle and genetic factors including age, BMI, smoking status, genetic risk, physical activity, and cancer history.
+                        </p>
+                        <div style="background:rgba(244,114,182,0.1);border-left:4px solid rgb(244,114,182);padding:16px;border-radius:8px;">
+                            <p style="color:var(--gray-300);font-size:14px;margin:0;"><strong>Time Required:</strong> 1-2 minutes</p>
+                        </div>
+                    </div>
+                    <a href="/cancer" class="btn btn-primary" style="margin-top:32px;display:block;text-align:center;padding:14px 28px;background:rgb(244,114,182);border-color:rgb(244,114,182);">
+                        Start Cancer Assessment →
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Safety Precautions Section -->
+    <section class="services-section" style="padding: 80px 0 40px;background:rgba(0,0,0,0.3);">
+        <div class="container">
+            <div class="section-header reveal">
+                <div class="section-label">Health Safety</div>
+                <h2 class="section-title">Prevention & Safety Tips</h2>
+                <p class="section-subtitle">
+                    Take proactive steps to prevent heart disease and cancer through lifestyle modifications and regular medical checkups.
+                </p>
+            </div>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:32px;margin-top:48px;">
+                <!-- Heart Disease Prevention -->
+                <div class="card" style="padding:32px;border-radius:16px;border-left:4px solid rgb(239,68,68);">
+                    <h3 style="color:#fff;margin-bottom:20px;font-size:20px;">🫀 Heart Disease Prevention</h3>
+                    <ul style="list-style:disc inside;color:var(--gray-200);line-height:2;font-size:14px;">
+                        <li>Maintain regular exercise (150+ min/week)</li>
+                        <li>Keep blood pressure below 120/80</li>
+                        <li>Reduce sodium and saturated fat intake</li>
+                        <li>Manage stress through meditation</li>
+                        <li>Quit smoking and limit alcohol</li>
+                        <li>Get adequate sleep (7-9 hours)</li>
+                        <li>Regular health checkups</li>
+                    </ul>
+                </div>
+
+                <!-- Cancer Prevention -->
+                <div class="card" style="padding:32px;border-radius:16px;border-left:4px solid rgb(244,114,182);">
+                    <h3 style="color:#fff;margin-bottom:20px;font-size:20px;">🧬 Cancer Prevention</h3>
+                    <ul style="list-style:disc inside;color:var(--gray-200);line-height:2;font-size:14px;">
+                        <li>Maintain healthy BMI (18.5-24.9)</li>
+                        <li>Avoid tobacco in all forms</li>
+                        <li>Limit alcohol consumption</li>
+                        <li>Increase physical activity</li>
+                        <li>Eat more vegetables & fruits</li>
+                        <li>Protect from UV rays</li>
+                        <li>Regular cancer screenings</li>
+                    </ul>
+                </div>
+
+                <!-- General Wellness -->
+                <div class="card" style="padding:32px;border-radius:16px;border-left:4px solid rgb(59,130,246);">
+                    <h3 style="color:#fff;margin-bottom:20px;font-size:20px;">✨ General Wellness</h3>
+                    <ul style="list-style:disc inside;color:var(--gray-200);line-height:2;font-size:14px;">
+                        <li>Stay hydrated (8+ glasses/day)</li>
+                        <li>Practice good mental health care</li>
+                        <li>Maintain social connections</li>
+                        <li>Regular health monitoring</li>
+                        <li>Follow balanced diet patterns</li>
+                        <li>Avoid processed foods</li>
+                        <li>Annual medical examination</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer" id="contact">
+        <div class="container">
+            <div class="footer-grid reveal">
+                <div class="footer-col">
+                    <div class="footer-brand">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MediCare Logo">
+                        <span>MediCare AI</span>
+                    </div>
+                    <p class="footer-about">
+                        AI-powered medical prediction platform providing advanced heart disease and cancer risk assessments for better health outcomes.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="social-link" aria-label="Facebook">📘</a>
+                        <a href="#" class="social-link" aria-label="Twitter">🐦</a>
+                        <a href="#" class="social-link" aria-label="LinkedIn">💼</a>
+                        <a href="#" class="social-link" aria-label="Instagram">📸</a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h4 class="footer-heading">Quick Links</h4>
+                    <ul class="footer-nav">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/about">About Us</a></li>
+                        <li><a href="/predict">Predictions</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4 class="footer-heading">Our Services</h4>
+                    <ul class="footer-nav">
+                        <li><a href="/predict_heart">Heart Disease Prediction</a></li>
+                        <li><a href="/cancer">Cancer Risk Analysis</a></li>
+                        <li><a href="/profile">Health Dashboard</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4 class="footer-heading">Contact Us</h4>
+                    <div class="footer-contact-list">
+                        <div class="footer-contact-item">
+                            <span class="footer-contact-icon">📞</span>
+                            <div>
+                                <p>+91 98765 43210</p>
+                                <p>+91 87654 32109</p>
+                            </div>
+                        </div>
+                        <div class="footer-contact-item">
+                            <span class="footer-contact-icon">✉️</span>
+                            <div>
+                                <p>contact@medicareai.com</p>
+                                <p>support@medicareai.com</p>
+                            </div>
+                        </div>
+                        <div class="footer-contact-item">
+                            <span class="footer-contact-icon">📍</span>
+                            <div>
+                                <p>123 Health Tech Park,<br>Anna Nagar, Chennai - 600040</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p class="footer-text">© 2026 MediCare AI. All rights reserved. For educational purposes only.</p>
+                <div class="footer-bottom-links">
+                    <a href="#">Terms of Service</a>
+                    <span class="footer-divider">|</span>
+                    <a href="#">Disclaimer</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <button class="scroll-top" id="scrollTopBtn" aria-label="Scroll to top">↑</button>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

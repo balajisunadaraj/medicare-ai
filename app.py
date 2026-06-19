@@ -103,22 +103,33 @@ def predict_heart_disease(form):
 
     if model is not None:
         prediction = model.predict([payload])
+        try:
+            prob = model.predict_proba([payload])[0]
+            risk_prob = int(prob[1] * 100) if len(prob) > 1 else 50
+            no_risk_prob = 100 - risk_prob
+        except:
+            risk_prob = 50
+            no_risk_prob = 50
+        
         if int(prediction[0]) == 1:
             return {
                 "label": "Heart Disease Detected",
                 "message": "The model predicts a likely presence of heart disease. Please consult a medical professional.",
-                "class": "risk-high"
+                "class": "risk-high",
+                "probability": {"risk": risk_prob, "no_risk": no_risk_prob}
             }
         return {
             "label": "No Heart Disease Detected",
             "message": "The model predicts no heart disease. Keep monitoring your health and maintain healthy habits.",
-            "class": "risk-low"
+            "class": "risk-low",
+            "probability": {"risk": risk_prob, "no_risk": no_risk_prob}
         }
 
     return {
         "label": "Model unavailable",
         "message": "No trained model was found. Place best_model.pkl in the project root to enable real predictions.",
-        "class": "risk-medium"
+        "class": "risk-medium",
+        "probability": {"risk": 50, "no_risk": 50}
     }
 
 
@@ -240,17 +251,27 @@ def predict_cancer(form):
 
     if cancer_model is not None:
         prediction = cancer_model.predict([payload])
+        try:
+            prob = cancer_model.predict_proba([payload])[0]
+            risk_prob = int(prob[1] * 100) if len(prob) > 1 else 50
+            no_risk_prob = 100 - risk_prob
+        except:
+            risk_prob = 50
+            no_risk_prob = 50
+        
         pred_label = str(prediction[0])
         if pred_label.lower() in ["yes", "1", "true"]:
             return {
                 "label": "Cancer Risk Detected",
                 "message": "The model predicts a possible cancer risk. Please consult a qualified healthcare professional.",
-                "class": "risk-high"
+                "class": "risk-high",
+                "probability": {"risk": risk_prob, "no_risk": no_risk_prob}
             }
         return {
             "label": "No Cancer Detected",
             "message": "The model predicts a low cancer risk based on the provided inputs.",
-            "class": "risk-low"
+            "class": "risk-low",
+            "probability": {"risk": risk_prob, "no_risk": no_risk_prob}
         }
 
     return {
@@ -348,8 +369,13 @@ def contact():
     return render_template("contact.html", submitted=submitted)
 
 
-@app.route("/predict", methods=["GET", "POST"])
+@app.route("/predict", methods=["GET"])
 def predict():
+    return render_template("predict_main.html")
+
+
+@app.route("/predict_heart", methods=["GET", "POST"])
+def predict_heart():
     result = None
     form = {
         "age": "0",
@@ -404,7 +430,7 @@ def predict():
             return jsonify(result)
 
     return render_template(
-        "predict.html",
+        "predict_heart.html",
         result=result,
         form=form,
         instructions=INSTRUCTIONS,

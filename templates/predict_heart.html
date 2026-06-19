@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Heart disease prediction using a trained machine learning model. Enter your health parameters for an AI-driven risk score.">
+    <title>Heart Disease Prediction | MediCare AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="bg-particles" aria-hidden="true">
+        <div class="orb"></div>
+        <div class="orb"></div>
+        <div class="orb"></div>
+    </div>
+
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <a href="/" class="navbar-brand">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MediCare Logo">
+                <span>MediCare</span>
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="/">Home</a></li>
+                <li><a href="/predict" class="active">Prediction</a></li>
+                <li><a href="/profile">Profile</a></li>
+                <li><a href="/contact">Contact</a></li>
+                <li><a href="/about">About</a></li>
+            </ul>
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <section class="hero hero-compact" id="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span class="pulse-dot"></span>
+                    Heart Disease Risk Check
+                </div>
+                <h1 class="hero-title">AI-Powered Heart Disease Prediction</h1>
+                <p class="hero-subtitle">
+                    Enter your health information below to get a model-based estimate of your cardiovascular risk.
+                </p>
+                <a href="#heart-form" class="btn btn-primary">Start Assessment</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="services-section" id="heart-form" style="padding: 80px 0 40px;">
+        <div class="container">
+            <div class="section-header reveal">
+                <div class="section-label">Heart Disease Prediction</div>
+                <h2 class="section-title">Heart Disease Risk Assessment</h2>
+                <p class="section-subtitle">
+                    Fill in your health metrics to receive a personalized cardiovascular risk estimate based on our trained AI model.
+                </p>
+            </div>
+
+            <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:32px;">
+                <a href="/predict" class="btn btn-secondary" style="flex:1;min-width:180px;">Back to Predictions</a>
+                <a href="{{ url_for('cancer') }}" class="btn btn-secondary" style="flex:1;min-width:180px;">Cancer Prediction</a>
+            </div>
+
+            <div class="predict-grid">
+                <!-- Left Panel: Instructions & Precautions -->
+                <div class="predict-panel">
+                    <h3>Instructions</h3>
+                    <ul style="list-style:disc inside;line-height:1.8;color:var(--gray-200);">
+                        {% for item in instructions %}
+                        <li>{{ item }}</li>
+                        {% endfor %}
+                    </ul>
+
+                    <h3 style="margin-top:32px;margin-bottom:16px;color:#fff;">Precautions to Prevent Heart Disease</h3>
+                    <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.18);border-radius:12px;padding:20px;margin-top:16px;">
+                        <ul style="list-style:disc inside;line-height:1.8;color:var(--gray-200);">
+                            {% for item in precautions %}
+                            <li>{{ item }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <div style="margin-top:32px;padding:20px;border-radius:18px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.18);">
+                        <strong>Important:</strong> This tool is not a replacement for medical advice. Always consult a physician for diagnosis and treatment.
+                    </div>
+
+                    <div class="chart-card" style="margin-top:32px;">
+                        <h3>Input Breakdown</h3>
+                        <p style="color:var(--gray-200);margin-bottom:16px;">Visual overview of your entered health metrics.</p>
+                        <div class="chart-wrapper" style="position:relative;height:300px;width:100%;">
+                            <canvas id="heartInputChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Panel: Form & Results -->
+                <div class="predict-panel">
+                    <h3>Enter Your Health Details</h3>
+                    <form id="predictForm" method="post" action="{{ url_for('predict_heart') }}" novalidate>
+                        <div style="display:grid;gap:18px;">
+                            <label>
+                                Age
+                                <input type="number" name="age" value="{{ form.age }}" min="1" max="120" placeholder="Age in years" required>
+                            </label>
+                            <label>
+                                Sex
+                                <select name="sex" required>
+                                    <option value="0" {% if form.sex == '0' %}selected{% endif %}>Female</option>
+                                    <option value="1" {% if form.sex == '1' %}selected{% endif %}>Male</option>
+                                </select>
+                            </label>
+                            <label>
+                                Chest Pain Type
+                                <select name="chest_pain" required>
+                                    <option value="0" {% if form.chest_pain == '0' %}selected{% endif %}>Asymptomatic</option>
+                                    <option value="1" {% if form.chest_pain == '1' %}selected{% endif %}>Atypical Angina</option>
+                                    <option value="2" {% if form.chest_pain == '2' %}selected{% endif %}>Non-anginal Pain</option>
+                                    <option value="3" {% if form.chest_pain == '3' %}selected{% endif %}>Typical Angina</option>
+                                </select>
+                            </label>
+                            <label>
+                                Resting Blood Pressure (mm Hg)
+                                <input type="number" name="resting_bp" value="{{ form.resting_bp }}" min="80" max="240" placeholder="Resting BP" required>
+                            </label>
+                            <label>
+                                Cholesterol (mg/dL)
+                                <input type="number" name="cholesterol" value="{{ form.cholesterol }}" min="100" max="450" placeholder="Cholesterol level" required>
+                            </label>
+                            <label>
+                                Fasting Blood Sugar > 120 mg/dL
+                                <select name="fasting_bs" required>
+                                    <option value="0" {% if form.fasting_bs == '0' %}selected{% endif %}>No</option>
+                                    <option value="1" {% if form.fasting_bs == '1' %}selected{% endif %}>Yes</option>
+                                </select>
+                            </label>
+                            <label>
+                                Resting ECG
+                                <select name="resting_ecg" required>
+                                    <option value="0" {% if form.resting_ecg == '0' %}selected{% endif %}>Left ventricular hypertrophy</option>
+                                    <option value="1" {% if form.resting_ecg == '1' %}selected{% endif %}>Normal</option>
+                                    <option value="2" {% if form.resting_ecg == '2' %}selected{% endif %}>ST-T wave abnormality</option>
+                                </select>
+                            </label>
+                            <label>
+                                Max Heart Rate Achieved
+                                <input type="number" name="max_hr" value="{{ form.max_hr }}" min="60" max="220" placeholder="Max heart rate" required>
+                            </label>
+                            <label>
+                                Exercise-Induced Angina
+                                <select name="exercise_angina" required>
+                                    <option value="0" {% if form.exercise_angina == '0' %}selected{% endif %}>No</option>
+                                    <option value="1" {% if form.exercise_angina == '1' %}selected{% endif %}>Yes</option>
+                                </select>
+                            </label>
+                            <label>
+                                ST Depression (Oldpeak)
+                                <input type="number" step="0.1" name="oldpeak" value="{{ form.oldpeak }}" min="0" max="10" placeholder="ST depression" required>
+                            </label>
+                            <label>
+                                ST Slope
+                                <select name="st_slope" required>
+                                    <option value="0" {% if form.st_slope == '0' %}selected{% endif %}>Downsloping</option>
+                                    <option value="1" {% if form.st_slope == '1' %}selected{% endif %}>Flat</option>
+                                    <option value="2" {% if form.st_slope == '2' %}selected{% endif %}>Upsloping</option>
+                                </select>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="margin-top:24px;">Predict Heart Risk</button>
+                    </form>
+
+                    <div id="heart-prediction-result-wrapper"></div>
+
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const form = document.getElementById('predictForm');
+                            const resultWrapper = document.getElementById('heart-prediction-result-wrapper');
+                            if (!form) return;
+
+                            form.addEventListener('submit', async function (e) {
+                                e.preventDefault();
+                                const url = (form.action || window.location.href).split('#')[0];
+                                const data = new FormData(form);
+                                try {
+                                    const resp = await fetch(url, {
+                                        method: 'POST',
+                                        body: data,
+                                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                                    });
+                                    const json = await resp.json();
+                                    const pieProbability = json.probability || { risk: 50, no_risk: 50 };
+                                    const pieSvg = `
+                                        <div class="chart-card" style="margin-top:28px;">
+                                            <h3>Prediction Probability</h3>
+                                            <div class="chart-wrapper" style="position:relative;height:300px;width:100%;">
+                                                <canvas id="resultPieChart"></canvas>
+                                            </div>
+                                        </div>`;
+                                    resultWrapper.innerHTML = `
+                                        <div class="card result-box" style="margin-top:28px;padding:24px;border-radius:22px;">
+                                            <h3 style="margin-bottom:10px;color:white;">${json.label}</h3>
+                                            <p style="color:var(--gray-200);">${json.message}</p>
+                                        </div>
+                                        ${pieSvg}`;
+                                    setTimeout(() => {
+                                        const ctx = document.getElementById('resultPieChart');
+                                        if (ctx) {
+                                            new Chart(ctx, {
+                                                type: 'doughnut',
+                                                data: {
+                                                    labels: ['Heart Disease Risk', 'No Disease Risk'],
+                                                    datasets: [{
+                                                        data: [pieProbability.risk, pieProbability.no_risk],
+                                                        backgroundColor: ['rgba(239,68,68,0.8)', 'rgba(34,197,94,0.8)'],
+                                                        borderColor: ['rgb(220,38,38)', 'rgb(22,163,74)'],
+                                                        borderWidth: 2
+                                                    }]
+                                                },
+                                                options: {
+                                                    responsive: true,
+                                                    maintainAspectRatio: false,
+                                                    plugins: {
+                                                        legend: { position: 'bottom', labels: { color: '#e5e7eb' } }
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    }, 100);
+                                    const navbarHeight = document.querySelector('.navbar')?.offsetHeight || 0;
+                                    const targetY = resultWrapper.getBoundingClientRect().top + window.pageYOffset - navbarHeight;
+                                    window.scrollTo({ top: targetY, behavior: 'smooth' });
+                                } catch (err) {
+                                    resultWrapper.innerHTML = `
+                                        <div class="card result-box" style="margin-top:28px;padding:24px;border-radius:22px;">
+                                            <h3 style="margin-bottom:10px;color:white;">Error</h3>
+                                            <p style="color:var(--gray-200);">Unable to get prediction. Please try again.</p>
+                                        </div>`;
+                                }
+                            });
+                        });
+
+                        function initHeartInputChart() {
+                            const canvas = document.getElementById('heartInputChart');
+                            if (!canvas) return;
+                            const form = document.getElementById('predictForm');
+                            const ctx = canvas.getContext('2d');
+                            if (!ctx) return;
+
+                            const chartInstance = new Chart(ctx, {
+                                type: 'bar',
+                                data: {
+                                    labels: ['Age', 'Resting BP', 'Cholesterol', 'Max HR', 'Oldpeak'],
+                                    datasets: [{
+                                        label: 'Your Values',
+                                        data: [
+                                            Math.min(parseInt(form.age.value) || 0, 120),
+                                            Math.min(parseInt(form.resting_bp.value) || 120, 240),
+                                            Math.min(parseInt(form.cholesterol.value) || 180, 450),
+                                            Math.min(parseInt(form.max_hr.value) || 130, 220),
+                                            Math.min(parseFloat(form.oldpeak.value) || 1.0, 10) * 20
+                                        ],
+                                        backgroundColor: 'rgba(59,130,246,0.7)',
+                                        borderColor: 'rgba(59,130,246,1)',
+                                        borderWidth: 1
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    scales: {
+                                        y: { beginAtZero: true, ticks: { color: '#e5e7eb' }, grid: { color: 'rgba(75,85,99,0.2)' } }
+                                    },
+                                    plugins: {
+                                        legend: { labels: { color: '#e5e7eb' } }
+                                    }
+                                }
+                            });
+
+                            form.addEventListener('change', () => {
+                                chartInstance.data.datasets[0].data = [
+                                    Math.min(parseInt(form.age.value) || 0, 120),
+                                    Math.min(parseInt(form.resting_bp.value) || 120, 240),
+                                    Math.min(parseInt(form.cholesterol.value) || 180, 450),
+                                    Math.min(parseInt(form.max_hr.value) || 130, 220),
+                                    Math.min(parseFloat(form.oldpeak.value) || 1.0, 10) * 20
+                                ];
+                                chartInstance.update();
+                            });
+                        }
+
+                        document.addEventListener('DOMContentLoaded', initHeartInputChart);
+                    </script>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer" id="contact">
+        <div class="container">
+            <div class="footer-grid reveal">
+                <div class="footer-col">
+                    <div class="footer-brand">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MediCare Logo">
+                        <span>MediCare AI</span>
+                    </div>
+                    <p class="footer-about">
+                        AI-powered medical prediction platform providing advanced heart disease and cancer risk assessments for better health outcomes.
+                    </p>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-heading">Quick Links</h4>
+                    <ul class="footer-nav">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/about">About Us</a></li>
+                        <li><a href="/predict">Predictions</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-heading">Our Services</h4>
+                    <ul class="footer-nav">
+                        <li><a href="/predict_heart">Heart Disease Prediction</a></li>
+                        <li><a href="/cancer">Cancer Risk Analysis</a></li>
+                        <li><a href="/profile">Health Dashboard</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-heading">Contact Us</h4>
+                    <div class="footer-contact-list">
+                        <div class="footer-contact-item">
+                            <span class="footer-contact-icon">📞</span>
+                            <div>
+                                <p>+91 98765 43210</p>
+                                <p>+91 87654 32109</p>
+                            </div>
+                        </div>
+                        <div class="footer-contact-item">
+                            <span class="footer-contact-icon">✉️</span>
+                            <div>
+                                <p>contact@medicareai.com</p>
+                                <p>support@medicareai.com</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="footer-text">© 2026 MediCare AI. All rights reserved. For educational purposes only.</p>
+            </div>
+        </div>
+    </footer>
+
+    <button class="scroll-top" id="scrollTopBtn" aria-label="Scroll to top">↑</button>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
