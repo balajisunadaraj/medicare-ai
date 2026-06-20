@@ -2,16 +2,21 @@ import os
 import pickle
 from datetime import datetime
 
+import pandas as pd
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 from auth import init_auth, login_manager, UserMixin, login_user, logout_user, current_user
 from database import db, init_db
 from werkzeug.security import generate_password_hash, check_password_hash
+from Cancer_prediction_dataset import LUNG_CANCER_FEATURES
 
 app = Flask("Medicare")
 app.secret_key = "Medicare-ai@123#"
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{os.path.join(basedir, 'medicare.db')}"
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
+    "MEDICARE_DATABASE_URI",
+    f"sqlite:///{os.path.join(basedir, 'medicare.db')}"
+)
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 init_auth(app)
@@ -59,16 +64,16 @@ PRECAUTIONS = [
 ]
 
 CANCER_INSTRUCTIONS = [
-    "Provide truthful demographic and lifestyle details for the cancer risk prediction.",
-    "Use the selection fields for encoded values like gender, smoker status, and income level.",
-    "Submit the form to receive an estimate based on the trained cancer model.",
+    "Provide truthful lung health, symptom, exposure, and family-history details.",
+    "Use Yes or No fields for symptoms and risk factors, and numeric values for age, energy level, and oxygen saturation.",
+    "Submit the form to receive an estimate from the trained lung cancer prediction model.",
     "Review results carefully and seek medical advice rather than relying on this prediction alone."
 ]
 
 CANCER_PRECAUTIONS = [
     "A predictive model is not a diagnostic tool; consult a healthcare professional for any concerns.",
-    "Lifestyle factors like smoking, employment, and social habits are included for model estimation.",
-    "Keep follow-up appointments and screenings as recommended by your doctor."
+    "Seek prompt care for persistent cough, chest pain, shortness of breath, throat discomfort, or low oxygen saturation.",
+    "Avoid tobacco smoke and pollution exposure where possible, and keep follow-up screenings as recommended by your doctor."
 ]
 
 
@@ -217,36 +222,131 @@ def build_health_dashboard(form):
     }
 
 
-CANCER_ENCODING = {
-    "Gender": {"Female": 0, "Male": 1},
-    "Smoking": {"No": 0, "Yes": 1},
-    "GeneticRisk": {"Low": 0, "Medium": 1, "High": 2},
-    "CancerHistory": {"No": 0, "Yes": 1}
+CANCER_FEATURE_NAMES = LUNG_CANCER_FEATURES
+
+CANCER_FIELD_LABELS = {
+    "AGE": "Age",
+    "GENDER": "Gender",
+    "SMOKING": "Currently Smoking",
+    "FINGER_DISCOLORATION": "Finger Discoloration",
+    "MENTAL_STRESS": "Mental Stress",
+    "EXPOSURE_TO_POLLUTION": "Pollution Exposure",
+    "LONG_TERM_ILLNESS": "Long-Term Illness",
+    "ENERGY_LEVEL": "Energy Level",
+    "IMMUNE_WEAKNESS": "Immune Weakness",
+    "BREATHING_ISSUE": "Breathing Issue",
+    "ALCOHOL_CONSUMPTION": "Alcohol Consumption",
+    "THROAT_DISCOMFORT": "Throat Discomfort",
+    "OXYGEN_SATURATION": "Oxygen Saturation",
+    "CHEST_TIGHTNESS": "Chest Tightness",
+    "FAMILY_HISTORY": "Family History",
+    "SMOKING_FAMILY_HISTORY": "Smoking in Family History",
+    "STRESS_IMMUNE": "Stress-Related Immune Issues",
 }
 
+CANCER_FORM_DEFAULTS = {
+    "AGE": "45",
+    "GENDER": "0",
+    "SMOKING": "0",
+    "FINGER_DISCOLORATION": "0",
+    "MENTAL_STRESS": "0",
+    "EXPOSURE_TO_POLLUTION": "0",
+    "LONG_TERM_ILLNESS": "0",
+    "ENERGY_LEVEL": "60",
+    "IMMUNE_WEAKNESS": "0",
+    "BREATHING_ISSUE": "0",
+    "ALCOHOL_CONSUMPTION": "0",
+    "THROAT_DISCOMFORT": "0",
+    "OXYGEN_SATURATION": "97",
+    "CHEST_TIGHTNESS": "0",
+    "FAMILY_HISTORY": "0",
+    "SMOKING_FAMILY_HISTORY": "0",
+    "STRESS_IMMUNE": "0",
+}
 
-def encode_cancer_value(value, mapping):
-    if value in mapping:
-        return mapping[value]
-    try:
-        numeric = int(value)
-        if numeric in mapping.values():
-            return numeric
-    except (TypeError, ValueError):
-        pass
-    return 0
+CANCER_FORM_FIELDS = [
+    {
+        "name": "AGE",
+        "label": "Age",
+        "type": "number",
+        "min": 1,
+        "max": 120,
+        "step": 1,
+        "help": "Patient age in years.",
+    },
+    {
+        "name": "GENDER",
+        "label": "Gender",
+        "type": "select",
+        "options": [("0", "Female"), ("1", "Male")],
+        "help": "Select the gender value used by the dataset.",
+    },
+    {
+        "name": "ENERGY_LEVEL",
+        "label": "Energy Level",
+        "type": "number",
+        "min": 0,
+        "max": 100,
+        "step": 0.1,
+        "help": "Approximate energy score from 0 to 100.",
+    },
+    {
+        "name": "OXYGEN_SATURATION",
+        "label": "Oxygen Saturation",
+        "type": "number",
+        "min": 70,
+        "max": 100,
+        "step": 0.1,
+        "help": "SpO2 percentage, such as 97.",
+    },
+]
+
+for field_name in [
+    "SMOKING",
+    "FINGER_DISCOLORATION",
+    "MENTAL_STRESS",
+    "EXPOSURE_TO_POLLUTION",
+    "LONG_TERM_ILLNESS",
+    "IMMUNE_WEAKNESS",
+    "BREATHING_ISSUE",
+    "ALCOHOL_CONSUMPTION",
+    "THROAT_DISCOMFORT",
+    "CHEST_TIGHTNESS",
+    "FAMILY_HISTORY",
+    "SMOKING_FAMILY_HISTORY",
+    "STRESS_IMMUNE",
+]:
+    CANCER_FORM_FIELDS.append(
+        {
+            "name": field_name,
+            "label": CANCER_FIELD_LABELS[field_name],
+            "type": "select",
+            "options": [("0", "No"), ("1", "Yes")],
+            "help": "Choose Yes if this factor applies.",
+        }
+    )
+
+
+def parse_cancer_feature_value(field_name, value):
+    if field_name in ["AGE"]:
+        return parse_int(value, parse_int(CANCER_FORM_DEFAULTS[field_name]))
+    if field_name in ["ENERGY_LEVEL", "OXYGEN_SATURATION"]:
+        return parse_float(value, parse_float(CANCER_FORM_DEFAULTS[field_name]))
+    return 1 if str(value).strip() in ["1", "Yes", "yes", "true", "True"] else 0
+
+
+def get_cancer_probability_index(model):
+    classes = list(getattr(model, "classes_", []))
+    for risk_label in ["YES", "Yes", "yes", "1", 1, True]:
+        if risk_label in classes:
+            return classes.index(risk_label)
+    return 1 if len(classes) > 1 else 0
 
 
 def predict_cancer(form):
     payload = [
-        encode_cancer_value(form.get("gender", "Female"), CANCER_ENCODING["Gender"]),
-        parse_int(form.get("age", 0)),
-        parse_float(form.get("bmi", 0.0)),
-        encode_cancer_value(form.get("smoking", "No"), CANCER_ENCODING["Smoking"]),
-        encode_cancer_value(form.get("genetic_risk", "Medium"), CANCER_ENCODING["GeneticRisk"]),
-        parse_float(form.get("physical_activity", 0.0)),
-        parse_float(form.get("alcohol_intake", 0.0)),
-        encode_cancer_value(form.get("cancer_history", "No"), CANCER_ENCODING["CancerHistory"])
+        parse_cancer_feature_value(feature_name, form.get(feature_name, CANCER_FORM_DEFAULTS[feature_name]))
+        for feature_name in CANCER_FEATURE_NAMES
     ]
 
     risk_prob = 50
@@ -254,10 +354,12 @@ def predict_cancer(form):
 
     if cancer_model is not None:
         try:
-            prediction = cancer_model.predict([payload])
+            cancer_input = pd.DataFrame([payload], columns=CANCER_FEATURE_NAMES)
+            prediction = cancer_model.predict(cancer_input)
             try:
-                prob = cancer_model.predict_proba([payload])[0]
-                risk_prob = int(prob[1] * 100) if len(prob) > 1 else 50
+                prob = cancer_model.predict_proba(cancer_input)[0]
+                risk_index = get_cancer_probability_index(cancer_model)
+                risk_prob = int(prob[risk_index] * 100) if len(prob) > risk_index else 50
                 no_risk_prob = 100 - risk_prob
             except Exception:
                 risk_prob = 50
@@ -266,14 +368,14 @@ def predict_cancer(form):
             pred_label = str(prediction[0])
             if pred_label.lower() in ["yes", "1", "true"]:
                 return {
-                    "label": "Cancer Risk Detected",
-                    "message": "The model predicts a possible cancer risk. Please consult a qualified healthcare professional.",
+                    "label": "Lung Cancer Risk Detected",
+                    "message": "The model predicts possible lung cancer or pulmonary disease risk. Please consult a qualified healthcare professional.",
                     "class": "risk-high",
                     "probability": {"risk": risk_prob, "no_risk": no_risk_prob}
                 }
             return {
-                "label": "No Cancer Detected",
-                "message": "The model predicts a low cancer risk based on the provided inputs.",
+                "label": "Low Lung Cancer Risk",
+                "message": "The model predicts low lung cancer or pulmonary disease risk based on the provided inputs.",
                 "class": "risk-low",
                 "probability": {"risk": risk_prob, "no_risk": no_risk_prob}
             }
@@ -342,12 +444,14 @@ class CancerPredictionRecord(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     gender = db.Column(db.Integer, nullable=False)
     age = db.Column(db.Integer, nullable=False)
-    bmi = db.Column(db.Float, nullable=False)
-    smoking = db.Column(db.Integer, nullable=False)
-    genetic_risk = db.Column(db.Integer, nullable=False)
-    physical_activity = db.Column(db.Float, nullable=False)
-    alcohol_intake = db.Column(db.Float, nullable=False)
-    cancer_history = db.Column(db.Integer, nullable=False)
+    marital_status = db.Column(db.Integer, nullable=False)
+    children = db.Column(db.Integer, nullable=False)
+    smoker = db.Column(db.Integer, nullable=False)
+    employed = db.Column(db.Integer, nullable=False)
+    years_worked = db.Column(db.Integer, nullable=False)
+    income_level = db.Column(db.Integer, nullable=False)
+    social_media = db.Column(db.Integer, nullable=False)
+    online_gaming = db.Column(db.Integer, nullable=False)
     prediction = db.Column(db.String(64), nullable=False)
     message = db.Column(db.String(256), nullable=False)
     risk_class = db.Column(db.String(32), nullable=False)
@@ -470,47 +574,30 @@ def predict_heart():
 @app.route("/cancer", methods=["GET", "POST"])
 def cancer():
     cancer_result = None
-    cancer_form = {
-        "gender": "Female",
-        "age": "0",
-        "bmi": "25.0",
-        "smoking": "No",
-        "genetic_risk": "Medium",
-        "physical_activity": "5.0",
-        "alcohol_intake": "2.0",
-        "cancer_history": "No"
-    }
+    cancer_form = CANCER_FORM_DEFAULTS.copy()
 
     if request.method == "POST":
         try:
             cancer_form.update({
-                "gender": request.form.get("gender", "Female"),
-                "age": request.form.get("age", "0"),
-                "bmi": request.form.get("bmi", "25.0"),
-                "smoking": request.form.get("smoking", "No"),
-                "genetic_risk": request.form.get("genetic_risk", "Medium"),
-                "physical_activity": request.form.get("physical_activity", "5.0"),
-                "alcohol_intake": request.form.get("alcohol_intake", "2.0"),
-                "cancer_history": request.form.get("cancer_history", "No")
+                feature_name: request.form.get(feature_name, CANCER_FORM_DEFAULTS[feature_name])
+                for feature_name in CANCER_FEATURE_NAMES
             })
             cancer_result = predict_cancer(cancer_form)
-            
-            # Handle AJAX requests first
-            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-                return jsonify(cancer_result)
-            
+
             # Persist prediction to database
             try:
                 record = CancerPredictionRecord(
                     user_id=current_user.id if current_user.is_authenticated else None,
-                    gender=encode_cancer_value(cancer_form["gender"], CANCER_ENCODING["Gender"]),
-                    age=parse_int(cancer_form["age"]),
-                    bmi=parse_float(cancer_form["bmi"]),
-                    smoking=encode_cancer_value(cancer_form["smoking"], CANCER_ENCODING["Smoking"]),
-                    genetic_risk=encode_cancer_value(cancer_form["genetic_risk"], CANCER_ENCODING["GeneticRisk"]),
-                    physical_activity=parse_float(cancer_form["physical_activity"]),
-                    alcohol_intake=parse_float(cancer_form["alcohol_intake"]),
-                    cancer_history=encode_cancer_value(cancer_form["cancer_history"], CANCER_ENCODING["CancerHistory"]),
+                    gender=parse_cancer_feature_value("GENDER", cancer_form["GENDER"]),
+                    age=parse_cancer_feature_value("AGE", cancer_form["AGE"]),
+                    marital_status=parse_cancer_feature_value("MENTAL_STRESS", cancer_form["MENTAL_STRESS"]),
+                    children=parse_cancer_feature_value("FINGER_DISCOLORATION", cancer_form["FINGER_DISCOLORATION"]),
+                    smoker=parse_cancer_feature_value("SMOKING", cancer_form["SMOKING"]),
+                    employed=parse_cancer_feature_value("EXPOSURE_TO_POLLUTION", cancer_form["EXPOSURE_TO_POLLUTION"]),
+                    years_worked=parse_int(parse_cancer_feature_value("ENERGY_LEVEL", cancer_form["ENERGY_LEVEL"])),
+                    income_level=parse_cancer_feature_value("IMMUNE_WEAKNESS", cancer_form["IMMUNE_WEAKNESS"]),
+                    social_media=parse_cancer_feature_value("BREATHING_ISSUE", cancer_form["BREATHING_ISSUE"]),
+                    online_gaming=parse_cancer_feature_value("ALCOHOL_CONSUMPTION", cancer_form["ALCOHOL_CONSUMPTION"]),
                     prediction=cancer_result.get("label", "Unknown"),
                     message=cancer_result.get("message", ""),
                     risk_class=cancer_result.get("class", "risk-medium")
@@ -520,6 +607,10 @@ def cancer():
             except Exception as db_error:
                 db.session.rollback()
                 print(f"Database error saving cancer prediction: {str(db_error)}")
+
+            # Handle AJAX requests after prediction and best-effort persistence.
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return jsonify(cancer_result)
         except Exception as e:
             cancer_result = {
                 "label": "Error",
@@ -534,14 +625,7 @@ def cancer():
         "cancer.html",
         cancer_result=cancer_result,
         cancer_form=cancer_form,
-        instructions=CANCER_INSTRUCTIONS,
-        precautions=CANCER_PRECAUTIONS
-    )
-
-    return render_template(
-        "cancer.html",
-        cancer_result=cancer_result,
-        cancer_form=cancer_form,
+        cancer_fields=CANCER_FORM_FIELDS,
         instructions=CANCER_INSTRUCTIONS,
         precautions=CANCER_PRECAUTIONS
     )

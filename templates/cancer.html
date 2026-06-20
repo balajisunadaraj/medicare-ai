@@ -85,14 +85,12 @@
                         {% endfor %}
                     </ul>
 
-                    <h3 style="margin-top:32px;margin-bottom:16px;color:#fff;">Precautions to Prevent Cancer</h3>
-                    <div style="background:rgba(244,114,182,0.08);border:1px solid rgba(244,114,182,0.18);border-radius:12px;padding:20px;margin-top:16px;">
-                        <ul style="list-style:disc inside;line-height:1.8;color:var(--gray-200);">
-                            {% for item in precautions %}
-                            <li>{{ item }}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
+                    <h3 style="margin-top:32px;margin-bottom:16px;color:#fff;">Precautions</h3>
+                    <ul style="list-style:disc inside;line-height:1.8;color:var(--gray-200);">
+                        {% for item in precautions %}
+                        <li>{{ item }}</li>
+                        {% endfor %}
+                    </ul>
 
                     <div style="margin-top:32px;padding:20px;border-radius:18px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.18);">
                         <strong>Important:</strong> This tool is not a substitute for professional medical evaluation. Use it only as an informational guide.
@@ -105,7 +103,7 @@
                         <div style="display:grid;gap:18px;">
                             <label>
                                 Age
-                                <input type="number" name="age" value="{{ cancer_form.age }}" min="18" max="100" placeholder="Age in years" required>
+                                <input type="number" name="age" value="{{ cancer_form.age }}" min="1" max="120" placeholder="Age in years" required>
                             </label>
                             <label>
                                 Gender
@@ -114,38 +112,58 @@
                                     <option value="Male" {% if cancer_form.gender == 'Male' %}selected{% endif %}>Male</option>
                                 </select>
                             </label>
+                           
                             <label>
-                                BMI
-                                <input type="number" name="bmi" value="{{ cancer_form.bmi }}" min="10" max="60" step="0.1" placeholder="Body Mass Index" required>
-                            </label>
-                            <label>
-                                Smoking
-                                <select name="smoking" required>
-                                    <option value="No" {% if cancer_form.smoking == 'No' %}selected{% endif %}>No</option>
-                                    <option value="Yes" {% if cancer_form.smoking == 'Yes' %}selected{% endif %}>Yes</option>
+                                Marital Status
+                                <select name="marital_status" required>
+                                    <option value="Married" {% if cancer_form.marital_status == 'Married' %}selected{% endif %}>Married</option>
+                                    <option value="Separated" {% if cancer_form.marital_status == 'Separated' %}selected{% endif %}>Separated</option>
+                                    <option value="Single" {% if cancer_form.marital_status == 'Single' %}selected{% endif %}>Single</option>
+                                    <option value="Widowed" {% if cancer_form.marital_status == 'Widowed' %}selected{% endif %}>Widowed</option>
                                 </select>
                             </label>
                             <label>
-                                Genetic Risk
-                                <select name="genetic_risk" required>
-                                    <option value="Low" {% if cancer_form.genetic_risk == 'Low' %}selected{% endif %}>Low</option>
-                                    <option value="Medium" {% if cancer_form.genetic_risk == 'Medium' %}selected{% endif %}>Medium</option>
-                                    <option value="High" {% if cancer_form.genetic_risk == 'High' %}selected{% endif %}>High</option>
+                                Children
+                                <input type="number" name="children" value="{{ cancer_form.children }}" min="0" max="10" placeholder="Number of children" required>
+                            </label>
+                            <label>
+                                Smoker
+                                <select name="smoker" required>
+                                    <option value="No" {% if cancer_form.smoker == 'No' %}selected{% endif %}>No</option>
+                                    <option value="Yes" {% if cancer_form.smoker == 'Yes' %}selected{% endif %}>Yes</option>
                                 </select>
                             </label>
                             <label>
-                                Physical Activity
-                                <input type="number" name="physical_activity" value="{{ cancer_form.physical_activity }}" min="0" max="20" step="0.1" placeholder="Physical activity score" required>
+                                Employed
+                                <select name="employed" required>
+                                    <option value="No" {% if cancer_form.employed == 'No' %}selected{% endif %}>No</option>
+                                    <option value="Yes" {% if cancer_form.employed == 'Yes' %}selected{% endif %}>Yes</option>
+                                </select>
                             </label>
                             <label>
-                                Alcohol Intake
-                                <input type="number" name="alcohol_intake" value="{{ cancer_form.alcohol_intake }}" min="0" max="10" step="0.1" placeholder="Alcohol intake score" required>
+                                Years Worked
+                                <input type="number" name="years_worked" value="{{ cancer_form.years_worked }}" min="0" max="80" placeholder="Years worked" required>
                             </label>
                             <label>
-                                Cancer History
-                                <select name="cancer_history" required>
-                                    <option value="No" {% if cancer_form.cancer_history == 'No' %}selected{% endif %}>No</option>
-                                    <option value="Yes" {% if cancer_form.cancer_history == 'Yes' %}selected{% endif %}>Yes</option>
+                                Income Level
+                                <select name="income_level" required>
+                                    <option value="High" {% if cancer_form.income_level == 'High' %}selected{% endif %}>High</option>
+                                    <option value="Low" {% if cancer_form.income_level == 'Low' %}selected{% endif %}>Low</option>
+                                    <option value="Medium" {% if cancer_form.income_level == 'Medium' %}selected{% endif %}>Medium</option>
+                                </select>
+                            </label>
+                            <label>
+                                Social Media
+                                <select name="social_media" required>
+                                    <option value="No" {% if cancer_form.social_media == 'No' %}selected{% endif %}>No</option>
+                                    <option value="Yes" {% if cancer_form.social_media == 'Yes' %}selected{% endif %}>Yes</option>
+                                </select>
+                            </label>
+                            <label>
+                                Online Gaming
+                                <select name="online_gaming" required>
+                                    <option value="No" {% if cancer_form.online_gaming == 'No' %}selected{% endif %}>No</option>
+                                    <option value="Yes" {% if cancer_form.online_gaming == 'Yes' %}selected{% endif %}>Yes</option>
                                 </select>
                             </label>
                         </div>
@@ -153,12 +171,83 @@
                         <button type="submit" class="btn btn-primary" style="margin-top:24px;">Predict Cancer Risk</button>
                     </form>
 
-                    <div id="cancer-prediction-result-wrapper"></div>
+                    <div id="cancer-prediction-result-wrapper">
+                        {% if cancer_result %}
+                        <div class="card result-box" style="margin-top:28px;padding:24px;border-radius:22px;">
+                            <h3 style="margin-bottom:10px;color:white;">{{ cancer_result.label }}</h3>
+                            <p style="color:var(--gray-200);">{{ cancer_result.message }}</p>
+                        </div>
+                        <div class="chart-card" style="margin-top:28px;">
+                            <h3>Prediction Probability</h3>
+                            <div class="chart-wrapper" style="position:relative;height:300px;width:100%;">
+                                <canvas id="cancerResultPieChart"></canvas>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
 
                     <script>
                         document.addEventListener('DOMContentLoaded', function () {
                             const form = document.getElementById('cancerForm');
                             const resultWrapper = document.getElementById('cancer-prediction-result-wrapper');
+                            let cancerPieChart = null;
+
+                            function escapeHtml(value) {
+                                const div = document.createElement('div');
+                                div.textContent = value || '';
+                                return div.innerHTML;
+                            }
+
+                            function drawCancerPieChart(probability) {
+                                const canvas = document.getElementById('cancerResultPieChart');
+                                if (!canvas || typeof Chart === 'undefined') return;
+                                const pieProbability = probability || { risk: 50, no_risk: 50 };
+
+                                if (cancerPieChart) {
+                                    cancerPieChart.destroy();
+                                }
+
+                                cancerPieChart = new Chart(canvas, {
+                                    type: 'doughnut',
+                                    data: {
+                                        labels: ['Cancer Risk', 'No Cancer Risk'],
+                                        datasets: [{
+                                            data: [pieProbability.risk, pieProbability.no_risk],
+                                            backgroundColor: ['rgba(239,68,68,0.8)', 'rgba(34,197,94,0.8)'],
+                                            borderColor: ['rgb(220,38,38)', 'rgb(22,163,74)'],
+                                            borderWidth: 2
+                                        }]
+                                    },
+                                    options: {
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        plugins: {
+                                            legend: { position: 'bottom', labels: { color: '#e5e7eb' } }
+                                        }
+                                    }
+                                });
+                            }
+
+                            function showCancerResult(result) {
+                                resultWrapper.innerHTML = `
+                                    <div class="card result-box" style="margin-top:28px;padding:24px;border-radius:22px;">
+                                        <h3 style="margin-bottom:10px;color:white;">${escapeHtml(result.label)}</h3>
+                                        <p style="color:var(--gray-200);">${escapeHtml(result.message)}</p>
+                                    </div>
+                                    <div class="chart-card" style="margin-top:28px;">
+                                        <h3>Prediction Probability</h3>
+                                        <div class="chart-wrapper" style="position:relative;height:300px;width:100%;">
+                                            <canvas id="cancerResultPieChart"></canvas>
+                                        </div>
+                                    </div>`;
+                                drawCancerPieChart(result.probability);
+                            }
+
+                            const initialResult = {{ cancer_result|tojson if cancer_result else 'null' }};
+                            if (initialResult) {
+                                drawCancerPieChart(initialResult.probability);
+                            }
+
                             if (!form) return;
 
                             form.addEventListener('submit', async function (e) {
@@ -170,45 +259,12 @@
                                         method: 'POST',
                                         body: data,
                                         headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                                    const pieProbability = json.probability || { risk: 50, no_risk: 50 };
-                                    const pieSvg = `
-                                        <div class="chart-card" style="margin-top:28px;">
-                                            <h3>Prediction Probability</h3>
-                                            <div class="chart-wrapper" style="position:relative;height:300px;width:100%;">
-                                                <canvas id="resultCancerPieChart"></canvas>
-                                            </div>
-                                        </div>`;
-                                    resultWrapper.innerHTML = `
-                                        <div class="card result-box" style="margin-top:28px;padding:24px;border-radius:22px;">
-                                            <h3 style="margin-bottom:10px;color:white;">${json.label}</h3>
-                                            <p style="color:var(--gray-200);">${json.message}</p>
-                                        </div>
-                                        ${pieSvg}`;
-                                    setTimeout(() => {
-                                        const ctx = document.getElementById('resultCancerPieChart');
-                                        if (ctx) {
-                                            new Chart(ctx, {
-                                                type: 'doughnut',
-                                                data: {
-                                                    labels: ['Cancer Risk', 'No Cancer Risk'],
-                                                    datasets: [{
-                                                        data: [pieProbability.risk, pieProbability.no_risk],
-                                                        backgroundColor: ['rgba(244,114,182,0.8)', 'rgba(34,197,94,0.8)'],
-                                                        borderColor: ['rgb(236,72,153)', 'rgb(22,163,74)'],
-                                                        borderWidth: 2
-                                                    }]
-                                                },
-                                                options: {
-                                                    responsive: true,
-                                                    maintainAspectRatio: false,
-                                                    plugins: {
-                                                        legend: { position: 'bottom', labels: { color: '#e5e7eb' } }
-                                                    }
-                                                }
-                                            });
-                                        }
-                                    }, 100);
-                                    resultWrapper.innerHTML = `\n                                        <div class="card result-box" style="margin-top:28px;padding:24px;border-radius:22px;">\n                                            <h3 style="margin-bottom:10px;color:white;">${json.label}</h3>\n                                            <p style="color:var(--gray-200);">${json.message}</p>\n                                        </div>`;
+                                    });
+                                    const json = await resp.json();
+                                    if (!resp.ok) {
+                                        throw new Error(json.message || 'Prediction request failed');
+                                    }
+                                    showCancerResult(json);
                                     // scroll to result (account for fixed navbar)
                                     const navbarHeight = document.querySelector('.navbar')?.offsetHeight || 0;
                                     const targetY = resultWrapper.getBoundingClientRect().top + window.pageYOffset - navbarHeight;
