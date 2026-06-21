@@ -93,17 +93,23 @@ def parse_float(value, default=0.0):
 
 def predict_heart_disease(form):
     payload = [
-        parse_int(form.get("age", 0)),
-        parse_int(form.get("sex", 0)),
-        parse_int(form.get("chest_pain", 0)),
-        parse_int(form.get("resting_bp", 0)),
-        parse_int(form.get("cholesterol", 0)),
-        parse_int(form.get("fasting_bs", 0)),
-        parse_int(form.get("resting_ecg", 0)),
-        parse_int(form.get("max_hr", 0)),
-        parse_int(form.get("exercise_angina", 0)),
-        parse_float(form.get("oldpeak", 0.0)),
-        parse_int(form.get("st_slope", 0)),
+        parse_int(form.get("AGE", 0)),
+        parse_int(form.get("GENDER", 0)),
+        parse_int(form.get("SMOKING", 0)),
+        parse_int(form.get("FINGER_DISCOLORATION", 0)),
+        parse_int(form.get("MENTAL_STRESS", 0)),
+        parse_int(form.get("EXPOSURE_TO_POLLUTION", 0)),
+        parse_int(form.get("LONG_TERM_ILLNESS", 0)),
+        parse_float(form.get("ENERGY_LEVEL", 0)),
+        parse_int(form.get("IMMUNE_WEAKNESS", 0)),
+        parse_int(form.get("BREATHING_ISSUE", 0.0)),
+        parse_int(form.get("ALCOHOL_CONSUMPTION", 0)),
+        parse_int(form.get("THROAT_DISCOMFORT", 0)),
+        parse_float(form.get("OXYGEN_SATURATION", 0)),
+        parse_int(form.get("CHEST_TIGHTNESS", 0)),
+        parse_int(form.get("FAMILY_HISTORY", 0)),
+        parse_int(form.get("SMOKING_FAMILY_HISTORY", 0)),
+        parse_int(form.get("STRESS_IMMUNE", 0)),
     ]
 
     if model is not None:
