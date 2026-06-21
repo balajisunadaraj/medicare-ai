@@ -414,6 +414,9 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(256), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+    def __init__(self, **kwargs):
+        super(User, self).__init__(**kwargs)
+
 
 class Profile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -429,6 +432,9 @@ class Profile(db.Model):
     exercise_minutes = db.Column(db.Integer, nullable=False)
     sleep_hours = db.Column(db.Integer, nullable=False)
     stress_level = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, **kwargs):
+        super(Profile, self).__init__(**kwargs)
 
 
 class PredictionRecord(db.Model):
@@ -621,9 +627,10 @@ def cancer():
                     FINGER_DISCOLORATION=parse_cancer_feature_value("FINGER_DISCOLORATION", cancer_form["FINGER_DISCOLORATION"]),
                     SMOKING=parse_cancer_feature_value("SMOKING", cancer_form["SMOKING"]),
                     EXPOSURE_TO_POLLUTION=parse_cancer_feature_value("EXPOSURE_TO_POLLUTION", cancer_form["EXPOSURE_TO_POLLUTION"]),
-                    ENERGYLEVEL=parse_cancer_feature_value("ENERGY_LEVEL", cancer_form["ENERGY_LEVEL"]),
-                    IMMUNEWEAKNESS=parse_cancer_feature_value("IMMUNE_WEAKNESS", cancer_form["IMMUNE_WEAKNESS"]),
-                    BREATHINGISSUE=parse_cancer_feature_value("BREATHING_ISSUE", cancer_form["BREATHING_ISSUE"]),
+                    LONG_TERM_ILLNESS=parse_cancer_feature_value("LONG_TERM_ILLNESS", cancer_form["LONG_TERM_ILLNESS"]),
+                    ENERGY_LEVEL=parse_cancer_feature_value("ENERGY_LEVEL", cancer_form["ENERGY_LEVEL"]),
+                    IMMUNE_WEAKNESS=parse_cancer_feature_value("IMMUNE_WEAKNESS", cancer_form["IMMUNE_WEAKNESS"]),
+                    BREATHING_ISSUE=parse_cancer_feature_value("BREATHING_ISSUE", cancer_form["BREATHING_ISSUE"]),
                     ALCOHOL_CONSUMPTION=parse_cancer_feature_value("ALCOHOL_CONSUMPTION", cancer_form["ALCOHOL_CONSUMPTION"]),
                     THROAT_DISCOMFORT=parse_cancer_feature_value("THROAT_DISCOMFORT", cancer_form["THROAT_DISCOMFORT"]),
                     OXYGEN_SATURATION=parse_cancer_feature_value("OXYGEN_SATURATION", cancer_form["OXYGEN_SATURATION"]),
