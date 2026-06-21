@@ -93,48 +93,55 @@ def parse_float(value, default=0.0):
 
 def predict_heart_disease(form):
     payload = [
-        parse_int(form.get("AGE", 0)),
-        parse_int(form.get("GENDER", 0)),
-        parse_int(form.get("SMOKING", 0)),
-        parse_int(form.get("FINGER_DISCOLORATION", 0)),
-        parse_int(form.get("MENTAL_STRESS", 0)),
-        parse_int(form.get("EXPOSURE_TO_POLLUTION", 0)),
-        parse_int(form.get("LONG_TERM_ILLNESS", 0)),
-        parse_float(form.get("ENERGY_LEVEL", 0)),
-        parse_int(form.get("IMMUNE_WEAKNESS", 0)),
-        parse_int(form.get("BREATHING_ISSUE", 0.0)),
-        parse_int(form.get("ALCOHOL_CONSUMPTION", 0)),
-        parse_int(form.get("THROAT_DISCOMFORT", 0)),
-        parse_float(form.get("OXYGEN_SATURATION", 0)),
-        parse_int(form.get("CHEST_TIGHTNESS", 0)),
-        parse_int(form.get("FAMILY_HISTORY", 0)),
-        parse_int(form.get("SMOKING_FAMILY_HISTORY", 0)),
-        parse_int(form.get("STRESS_IMMUNE", 0)),
+        parse_int(form.get("age", 0)),
+        parse_int(form.get("sex", 0)),
+        parse_int(form.get("chest_pain", 0)),
+        parse_int(form.get("resting_bp", 0)),
+        parse_int(form.get("cholesterol", 0)),
+        parse_int(form.get("fasting_bs", 0)),
+        parse_int(form.get("resting_ecg", 0)),
+        parse_int(form.get("max_hr", 0)),
+        parse_int(form.get("exercise_angina", 0)),
+        parse_float(form.get("oldpeak", 0.0)),
+        parse_int(form.get("st_slope", 0)),
     ]
 
     if model is not None:
-        prediction = model.predict([payload])
         try:
-            prob = model.predict_proba([payload])[0]
-            risk_prob = int(prob[1] * 100) if len(prob) > 1 else 50
-            no_risk_prob = 100 - risk_prob
-        except:
-            risk_prob = 50
-            no_risk_prob = 50
-        
-        if int(prediction[0]) == 1:
+            heart_input = pd.DataFrame([payload], columns=[
+                'Age', 'Sex', 'ChestPainType', 'RestingBP', 'Cholesterol', 
+                'FastingBS', 'RestingECG', 'MaxHR', 'ExerciseAngina', 
+                'Oldpeak', 'ST_Slope'
+            ])
+            prediction = model.predict(heart_input)
+            try:
+                prob = model.predict_proba(heart_input)[0]
+                risk_prob = int(prob[1] * 100) if len(prob) > 1 else 50
+                no_risk_prob = 100 - risk_prob
+            except:
+                risk_prob = 50
+                no_risk_prob = 50
+            
+            if int(prediction[0]) == 1:
+                return {
+                    "label": "Heart Disease Detected",
+                    "message": "The model predicts a likely presence of heart disease. Please consult a medical professional.",
+                    "class": "risk-high",
+                    "probability": {"risk": risk_prob, "no_risk": no_risk_prob}
+                }
             return {
-                "label": "Heart Disease Detected",
-                "message": "The model predicts a likely presence of heart disease. Please consult a medical professional.",
-                "class": "risk-high",
+                "label": "No Heart Disease Detected",
+                "message": "The model predicts no heart disease. Keep monitoring your health and maintain healthy habits.",
+                "class": "risk-low",
                 "probability": {"risk": risk_prob, "no_risk": no_risk_prob}
             }
-        return {
-            "label": "No Heart Disease Detected",
-            "message": "The model predicts no heart disease. Keep monitoring your health and maintain healthy habits.",
-            "class": "risk-low",
-            "probability": {"risk": risk_prob, "no_risk": no_risk_prob}
-        }
+        except Exception as e:
+            return {
+                "label": "Prediction Error",
+                "message": f"An error occurred during prediction: {str(e)}",
+                "class": "risk-medium",
+                "probability": {"risk": 50, "no_risk": 50}
+            }
 
     return {
         "label": "Model unavailable",
@@ -428,26 +435,23 @@ class PredictionRecord(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    AGE = db.Column(db.Integer, nullable=False)
-    GENDER = db.Column(db.Integer, nullable=False)
-    SMOKING = db.Column(db.Integer, nullable=False)
-    FINGER_DISCOLORATION = db.Column(db.Integer, nullable=False)
-    MENTAL_STRESS = db.Column(db.Integer, nullable=False)
-    EXPOSURE_TO_POLLUTION = db.Column(db.Integer, nullable=False)
-    LONG_TERM_ILLNESS = db.Column(db.Integer, nullable=False)
-    ENERGY_LEVEL = db.Column(db.Float, nullable=False)
-    IMMUNE_WEAKNESS = db.Column(db.Integer, nullable=False)
-    BREATHING_ISSUE = db.Column(db.Integer, nullable=False)
-    ALCOHOL_CONSUMPTION = db.Column(db.Integer, nullable=False)
-    THROAT_DISCOMFORT = db.Column(db.Integer, nullable=False)
-    OXYGEN_SATURATION = db.Column(db.Float, nullable=False)
-    CHEST_TIGHTNESS = db.Column(db.Integer, nullable=False)
-    FAMILY_HISTORY = db.Column(db.Integer, nullable=False)
-    SMOKING_FAMILY_HISTORY = db.Column(db.Integer, nullable=False)
-    STRESS_IMMUNE = db.Column(db.Integer, nullable=False)
+    age = db.Column(db.Integer, nullable=False)
+    sex = db.Column(db.Integer, nullable=False)
+    chest_pain = db.Column(db.Integer, nullable=False)
+    resting_bp = db.Column(db.Integer, nullable=False)
+    cholesterol = db.Column(db.Integer, nullable=False)
+    fasting_bs = db.Column(db.Integer, nullable=False)
+    resting_ecg = db.Column(db.Integer, nullable=False)
+    max_hr = db.Column(db.Integer, nullable=False)
+    exercise_angina = db.Column(db.Integer, nullable=False)
+    oldpeak = db.Column(db.Float, nullable=False)
+    st_slope = db.Column(db.Integer, nullable=False)
     prediction = db.Column(db.String(64), nullable=False)
     message = db.Column(db.String(256), nullable=False)
     risk_class = db.Column(db.String(32), nullable=False)
+
+    def __init__(self, **kwargs):
+        super(PredictionRecord, self).__init__(**kwargs)
 
 
 class CancerPredictionRecord(db.Model):
@@ -474,6 +478,9 @@ class CancerPredictionRecord(db.Model):
     prediction = db.Column(db.String(64), nullable=False)
     message = db.Column(db.String(256), nullable=False)
     risk_class = db.Column(db.String(32), nullable=False)
+
+    def __init__(self, **kwargs):
+        super(CancerPredictionRecord, self).__init__(**kwargs)
 
 
 @login_manager.user_loader
@@ -513,45 +520,33 @@ def predict():
 def predict_heart():
     result = None
     form = {
-        "AGE": "0",
-        "GENDER": "0",
-        "SMOKING": "0",
-        "FINGER_DISCOLORATION": "0",
-        "MENTAL_STRESS": "0",
-        "EXPOSURE_TO_POLLUTION": "0",
-        "LONG_TERM_ILLNESS": "0",
-        "ENERGY_LEVEL": "0.0",
-        "IMMUNE_WEAKNESS": "0",
-        "BREATHING_ISSUE": "0",
-        "ALCOHOL_CONSUMPTION": "0",
-        "THROAT_DISCOMFORT": "0",
-        "OXYGEN_SATURATION": "0.0",
-        "CHEST_TIGHTNESS": "0",
-        "FAMILY_HISTORY": "0",
-        "SMOKING_FAMILY_HISTORY": "0",
-        "STRESS_IMMUNE": "0"
+        "age": "0",
+        "sex": "0",
+        "chest_pain": "0",
+        "resting_bp": "120",
+        "cholesterol": "200",
+        "fasting_bs": "0",
+        "resting_ecg": "1",
+        "max_hr": "150",
+        "exercise_angina": "0",
+        "oldpeak": "0.0",
+        "st_slope": "1"
     }
 
     if request.method == "POST":
         try:
             form.update({
-                "AGE": request.form.get("AGE", "0"),
-                "GENDER": request.form.get("GENDER", "0"),
-                "SMOKING": request.form.get("SMOKING", "0"),
-                "FINGER_DISCOLORATION": request.form.get("FINGER_DISCOLORATION", "0"),
-                "MENTAL_STRESS": request.form.get("MENTAL_STRESS", "0"),
-                "EXPOSURE_TO_POLLUTION": request.form.get("EXPOSURE_TO_POLLUTION", "0"),
-                "LONG_TERM_ILLNESS": request.form.get("LONG_TERM_ILLNESS", "0"),
-                "ENERGY_LEVEL": request.form.get("ENERGY_LEVEL", "0.0"),
-                "IMMUNE_WEAKNESS": request.form.get("IMMUNE_WEAKNESS", "0"),
-                "BREATHING_ISSUE": request.form.get("BREATHING_ISSUE", "0"),
-                "ALCOHOL_CONSUMPTION": request.form.get("ALCOHOL_CONSUMPTION", "0"),
-                "THROAT_DISCOMFORT": request.form.get("THROAT_DISCOMFORT", "0"),
-                "OXYGEN_SATURATION": request.form.get("OXYGEN_SATURATION", "0.0"),
-                "CHEST_TIGHTNESS": request.form.get("CHEST_TIGHTNESS", "0"),
-                "FAMILY_HISTORY": request.form.get("FAMILY_HISTORY", "0"),
-                "SMOKING_FAMILY_HISTORY": request.form.get("SMOKING_FAMILY_HISTORY", "0"),
-                "STRESS_IMMUNE": request.form.get("STRESS_IMMUNE", "0")
+                "age": request.form.get("age", "0"),
+                "sex": request.form.get("sex", "0"),
+                "chest_pain": request.form.get("chest_pain", "0"),
+                "resting_bp": request.form.get("resting_bp", "120"),
+                "cholesterol": request.form.get("cholesterol", "200"),
+                "fasting_bs": request.form.get("fasting_bs", "0"),
+                "resting_ecg": request.form.get("resting_ecg", "1"),
+                "max_hr": request.form.get("max_hr", "150"),
+                "exercise_angina": request.form.get("exercise_angina", "0"),
+                "oldpeak": request.form.get("oldpeak", "0.0"),
+                "st_slope": request.form.get("st_slope", "1")
             })
             
             result = predict_heart_disease(form)
@@ -564,22 +559,17 @@ def predict_heart():
             try:
                 record = PredictionRecord(
                     user_id=current_user.id if current_user.is_authenticated else None,
-                    AGE=parse_int(form["AGE"]),
-                    GENDER=parse_int(form["GENDER"]),
-                    SMOKING=parse_int(form["SMOKING"]),
-                    FINGER_DISCOLORATION=parse_int(form["FINGER_DISCOLORATION"]),
-                    MENTAL_STRESS=parse_int(form["MENTAL_STRESS"]),
-                    EXPOSURE_TO_POLLUTION=parse_int(form["EXPOSURE_TO_POLLUTION"]),
-                    LONG_TERM_ILLNESS=parse_int(form["LONG_TERM_ILLNESS"]),
-                    ENERGY_LEVEL=parse_float(form["ENERGY_LEVEL"]),
-                    IMMUNE_WEAKNESS=parse_int(form["IMMUNE_WEAKNESS"]),
-                    BREATHING_ISSUE=parse_int(form["BREATHING_ISSUE"]),
-                    ALCOHOL_CONSUMPTION=parse_int(form["ALCOHOL_CONSUMPTION"]),
-                    THROAT_DISCOMFORT=parse_int(form["THROAT_DISCOMFORT"]),
-                    OXYGEN_SATURATION=parse_float(form["OXYGEN_SATURATION"]),
-                    FAMILY_HISTORY=parse_int(form["FAMILY_HISTORY"]),
-                    SMOKING_FAMILY_HISTORY=parse_int(form["SMOKING_FAMILY_HISTORY"]),
-                    STRESS_IMMUNE=parse_int(form["STRESS_IMMUNE"]),
+                    age=parse_int(form["age"]),
+                    sex=parse_int(form["sex"]),
+                    chest_pain=parse_int(form["chest_pain"]),
+                    resting_bp=parse_int(form["resting_bp"]),
+                    cholesterol=parse_int(form["cholesterol"]),
+                    fasting_bs=parse_int(form["fasting_bs"]),
+                    resting_ecg=parse_int(form["resting_ecg"]),
+                    max_hr=parse_int(form["max_hr"]),
+                    exercise_angina=parse_int(form["exercise_angina"]),
+                    oldpeak=parse_float(form["oldpeak"]),
+                    st_slope=parse_int(form["st_slope"]),
                     prediction=result.get("label", "Unknown"),
                     message=result.get("message", ""),
                     risk_class=result.get("class", "risk-medium")
