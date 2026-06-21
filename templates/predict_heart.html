@@ -97,6 +97,12 @@
                             <canvas id="heartInputChart"></canvas>
                         </div>
                     </div>
+
+                    <div id="heart-dynamic-tips" style="display:none; margin-top:32px;" class="chart-card">
+                        <h3 id="heart-tips-title">Preventative Health Tips</h3>
+                        <ul id="heart-tips-list" style="list-style:disc inside;line-height:1.8;color:var(--gray-200);margin-top:16px;padding-left:10px;">
+                        </ul>
+                    </div>
                 </div>
 
                 <!-- Right Panel: Form & Results -->
@@ -232,6 +238,30 @@
                                             });
                                         }
                                     }, 100);
+                                    // Update dynamic tips
+                                    const tipsContainer = document.getElementById('heart-dynamic-tips');
+                                    const tipsTitle = document.getElementById('heart-tips-title');
+                                    const tipsList = document.getElementById('heart-tips-list');
+                                    
+                                    if (tipsContainer && tipsTitle && tipsList) {
+                                        tipsContainer.style.display = 'block';
+                                        if (json.label.toLowerCase().includes("no heart disease")) {
+                                            tipsTitle.innerText = "3 Tips to Prevent Heart Disease";
+                                            tipsList.innerHTML = `
+                                                <li style="margin-bottom:10px;"><strong>Maintain a Heart-Healthy Diet:</strong> Focus on whole grains, lean proteins, vegetables, fruits, and limit sodium, saturated fats, and processed sugars.</li>
+                                                <li style="margin-bottom:10px;"><strong>Regular Physical Activity:</strong> Aim for at least 150 minutes of moderate-intensity aerobic exercise, such as brisk walking, every week.</li>
+                                                <li style="margin-bottom:10px;"><strong>Monitor and Manage Vitals:</strong> Keep track of your blood pressure, cholesterol levels, and blood sugar, managing them through lifestyle choices or medical advice.</li>
+                                            `;
+                                        } else {
+                                            tipsTitle.innerText = "Tips to Prevent & Get Out of Cancer";
+                                            tipsList.innerHTML = `
+                                                <li style="margin-bottom:10px;"><strong>Avoid Tobacco and Limit Alcohol:</strong> Steer clear of all tobacco products and secondhand smoke, and moderate or eliminate alcohol consumption.</li>
+                                                <li style="margin-bottom:10px;"><strong>Eat Antioxidant-Rich Foods:</strong> Fuel your body with berries, leafy greens, cruciferous vegetables, and foods rich in vitamins and minerals to support cellular health.</li>
+                                                <li style="margin-bottom:10px;"><strong>Get Screened Regularly:</strong> Regular medical screenings (like lung CTs or routine blood panels) are vital to detecting and addressing cell anomalies at their earliest, most curable stages.</li>
+                                            `;
+                                        }
+                                    }
+
                                     const navbarHeight = document.querySelector('.navbar')?.offsetHeight || 0;
                                     const targetY = resultWrapper.getBoundingClientRect().top + window.pageYOffset - navbarHeight;
                                     window.scrollTo({ top: targetY, behavior: 'smooth' });
@@ -255,11 +285,10 @@
                             const chartInstance = new Chart(ctx, {
                                 type: 'bar',
                                 data: {
-                                    labels: ['Age', 'Resting BP', 'Cholesterol', 'Max HR', 'Oldpeak'],
+                                    labels: ['Resting BP', 'Cholesterol', 'Max HR', 'Oldpeak'],
                                     datasets: [{
                                         label: 'Your Values',
                                         data: [
-                                            Math.min(parseInt(form.age.value) || 0, 120),
                                             Math.min(parseInt(form.resting_bp.value) || 120, 240),
                                             Math.min(parseInt(form.cholesterol.value) || 180, 450),
                                             Math.min(parseInt(form.max_hr.value) || 130, 220),
@@ -281,10 +310,9 @@
                                     }
                                 }
                             });
-
+ 
                             form.addEventListener('change', () => {
                                 chartInstance.data.datasets[0].data = [
-                                    Math.min(parseInt(form.age.value) || 0, 120),
                                     Math.min(parseInt(form.resting_bp.value) || 120, 240),
                                     Math.min(parseInt(form.cholesterol.value) || 180, 450),
                                     Math.min(parseInt(form.max_hr.value) || 130, 220),
