@@ -305,7 +305,7 @@
                                 drawCancerPieChart(result.probability);
                             }
 
-                            const initialResult = {{ cancer_result|tojson if cancer_result else 'null' }};
+                            const initialResult = {{ cancer_result|default(None)|tojson|safe }};
                             if (initialResult) {
                                 drawCancerPieChart(initialResult.probability);
                             }
