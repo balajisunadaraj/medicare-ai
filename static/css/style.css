@@ -1648,19 +1648,25 @@ ul {
         form label:nth-child(10) { animation-delay: 1.0s; }
         form label:nth-child(11) { animation-delay: 1.1s; }
 
-/* ===== Info Icon Tooltip ===== */
-.field-label-row {
+/* ===== Input Icon Wrapper — icon pinned inside left of field ===== */
+.input-icon-wrapper {
+    position: relative;
     display: flex;
     align-items: center;
-    gap: 7px;
-    font-weight: 500;
-    color: #fff;
-    font-size: 0.95rem;
-    margin-bottom: 2px;
+}
+
+.input-icon-wrapper input,
+.input-icon-wrapper select {
+    padding-left: 36px !important;
+    width: 100%;
 }
 
 .info-icon {
-    position: relative;
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 5;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1670,96 +1676,80 @@ ul {
     background: rgba(59, 130, 246, 0.25);
     border: 1.5px solid rgba(59, 130, 246, 0.55);
     color: #93c5fd;
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     font-weight: 700;
     cursor: pointer;
     flex-shrink: 0;
-    transition: background 0.2s, border-color 0.2s;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
     outline: none;
-    font-style: normal;
     user-select: none;
     line-height: 1;
+    font-style: normal;
 }
 
 .info-icon:hover,
 .info-icon:focus {
-    background: rgba(59, 130, 246, 0.45);
+    background: rgba(59, 130, 246, 0.5);
     border-color: #60a5fa;
     color: #fff;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
 }
 
-.info-tooltip {
+/* ===== Global Fixed Tooltip ===== */
+.global-field-tip {
     display: none;
-    position: absolute;
-    left: 24px;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 9999;
-    background: rgba(8, 18, 52, 0.98);
-    border: 1px solid rgba(59, 130, 246, 0.35);
+    position: fixed;
+    z-index: 99999;
+    background: rgba(6, 14, 40, 0.97);
+    border: 1px solid rgba(59, 130, 246, 0.4);
     border-radius: 14px;
     padding: 14px 16px;
-    width: 280px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(12px);
+    width: 300px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(59,130,246,0.08);
+    backdrop-filter: blur(16px);
     pointer-events: none;
-}
-
-.info-icon:hover .info-tooltip,
-.info-icon:focus .info-tooltip {
-    display: block;
+    font-family: var(--font-body);
 }
 
 .info-tooltip-title {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     font-weight: 700;
     color: #93c5fd;
     text-transform: uppercase;
-    letter-spacing: 0.8px;
-    margin-bottom: 8px;
+    letter-spacing: 0.9px;
+    margin-bottom: 9px;
+    padding-bottom: 7px;
     border-bottom: 1px solid rgba(59, 130, 246, 0.2);
-    padding-bottom: 6px;
 }
 
-.info-tooltip table {
+.global-field-tip table {
     width: 100%;
     border-collapse: collapse;
     font-size: 0.8rem;
-    line-height: 1.5;
+    line-height: 1.55;
 }
 
-.info-tooltip table tr td {
+.global-field-tip table tr td {
     padding: 4px 6px 4px 0;
     color: #e2e8f0;
     vertical-align: top;
 }
 
-.info-tooltip table tr td:first-child {
+.global-field-tip table tr td:first-child {
     font-weight: 600;
     color: #93c5fd;
     white-space: nowrap;
     padding-right: 10px;
-    min-width: 80px;
+    min-width: 72px;
 }
 
-.info-tooltip p {
+.global-field-tip p {
     font-size: 0.8rem;
     color: #e2e8f0;
-    margin: 3px 0;
+    margin: 4px 0 0;
     line-height: 1.55;
 }
 
-.info-tooltip p strong {
+.global-field-tip p strong {
     color: #93c5fd;
-}
-
-/* Flip tooltip to left if near right edge */
-@media (max-width: 640px) {
-    .info-tooltip {
-        left: auto;
-        right: 24px;
-        top: 28px;
-        transform: none;
-        width: 220px;
-    }
 }
