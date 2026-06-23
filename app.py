@@ -1,6 +1,6 @@
 import os
 import pickle
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pandas as pd
 from flask import Flask, render_template, request, jsonify, redirect, url_for
@@ -18,6 +18,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
     f"sqlite:///{os.path.join(basedir, 'medicare.db')}"
 )
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["REMEMBER_COOKIE_DURATION"] = timedelta(days=30)
 
 init_auth(app)
 init_db(app)
@@ -714,7 +715,7 @@ def profile():
                 user = User(email=email, password_hash=generate_password_hash(password))
                 db.session.add(user)
                 db.session.commit()
-                login_user(user)
+                login_user(user, remember=True)
                 if is_ajax:
                     return jsonify({"success": True, "message": "Registration successful!"})
                 return redirect(url_for("profile"))
@@ -727,7 +728,7 @@ def profile():
             password = request.form.get("password", "")
             user = User.query.filter_by(email=email).first()
             if user and check_password_hash(user.password_hash, password):
-                login_user(user)
+                login_user(user, remember=True)
                 if is_ajax:
                     return jsonify({"success": True, "message": "Login successful!"})
                 return redirect(url_for("profile"))
