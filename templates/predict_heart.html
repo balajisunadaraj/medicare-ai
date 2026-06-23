@@ -122,7 +122,20 @@
                                 </select>
                             </label>
                             <label>
-                                Chest Pain Type
+                                <div class="field-label-row">
+                                    Chest Pain Type
+                                    <span class="info-icon" tabindex="0" aria-label="Chest Pain Type guide">ℹ
+                                        <div class="info-tooltip">
+                                            <div class="info-tooltip-title">Chest Pain Types</div>
+                                            <table>
+                                                <tr><td>TA</td><td>Typical Angina – Typical heart-related chest pain</td></tr>
+                                                <tr><td>ATA</td><td>Atypical Angina – Unusual heart-related chest pain</td></tr>
+                                                <tr><td>NAP</td><td>Non-Anginal Pain – Chest pain not related to the heart</td></tr>
+                                                <tr><td>ASY</td><td>Asymptomatic – No chest pain or symptoms</td></tr>
+                                            </table>
+                                        </div>
+                                    </span>
+                                </div>
                                 <select name="chest_pain" required>
                                     <option value="0" {% if form.chest_pain == '0' %}selected{% endif %}>Asymptomatic</option>
                                     <option value="1" {% if form.chest_pain == '1' %}selected{% endif %}>Atypical Angina</option>
@@ -131,22 +144,72 @@
                                 </select>
                             </label>
                             <label>
-                                Resting Blood Pressure (mm Hg)
+                                <div class="field-label-row">
+                                    Resting Blood Pressure (mm Hg)
+                                    <span class="info-icon" tabindex="0" aria-label="Resting BP guide">ℹ
+                                        <div class="info-tooltip">
+                                            <div class="info-tooltip-title">Resting Blood Pressure</div>
+                                            <table>
+                                                <tr><td>90–120</td><td>Normal systolic BP</td></tr>
+                                                <tr><td>120–129</td><td>Elevated BP</td></tr>
+                                                <tr><td>130–139</td><td>High BP Stage 1</td></tr>
+                                                <tr><td>≥ 140</td><td>High BP Stage 2</td></tr>
+                                            </table>
+                                        </div>
+                                    </span>
+                                </div>
                                 <input type="number" name="resting_bp" value="{{ form.resting_bp }}" min="80" max="240" placeholder="Resting BP" required>
                             </label>
                             <label>
-                                Cholesterol (mg/dL)
+                                <div class="field-label-row">
+                                    Cholesterol (mg/dL)
+                                    <span class="info-icon" tabindex="0" aria-label="Cholesterol guide">ℹ
+                                        <div class="info-tooltip">
+                                            <div class="info-tooltip-title">Cholesterol Level</div>
+                                            <table>
+                                                <tr><td>&lt; 200</td><td>Normal – Healthy level</td></tr>
+                                                <tr><td>200–239</td><td>Borderline High – May increase risk</td></tr>
+                                                <tr><td>≥ 240</td><td>High – Associated with higher heart disease risk</td></tr>
+                                            </table>
+                                        </div>
+                                    </span>
+                                </div>
                                 <input type="number" name="cholesterol" value="{{ form.cholesterol }}" min="100" max="450" placeholder="Cholesterol level" required>
                             </label>
                             <label>
-                                Fasting Blood Sugar > 120 mg/dL
+                                <div class="field-label-row">
+                                    Fasting Blood Sugar &gt; 120 mg/dL
+                                    <span class="info-icon" tabindex="0" aria-label="Fasting Blood Sugar guide">ℹ
+                                        <div class="info-tooltip">
+                                            <div class="info-tooltip-title">Fasting Blood Sugar</div>
+                                            <table>
+                                                <tr><td>&lt; 100</td><td>Normal – Healthy blood sugar</td></tr>
+                                                <tr><td>100–125</td><td>Prediabetes – Increased diabetes risk</td></tr>
+                                                <tr><td>≥ 126</td><td>Diabetes – Confirmed by medical testing</td></tr>
+                                            </table>
+                                            <p style="margin-top:8px;">Select <strong>Yes</strong> if your fasting blood sugar exceeds 120 mg/dL.</p>
+                                        </div>
+                                    </span>
+                                </div>
                                 <select name="fasting_bs" required>
                                     <option value="0" {% if form.fasting_bs == '0' %}selected{% endif %}>No</option>
                                     <option value="1" {% if form.fasting_bs == '1' %}selected{% endif %}>Yes</option>
                                 </select>
                             </label>
                             <label>
-                                Resting ECG
+                                <div class="field-label-row">
+                                    Resting ECG
+                                    <span class="info-icon" tabindex="0" aria-label="Resting ECG guide">ℹ
+                                        <div class="info-tooltip">
+                                            <div class="info-tooltip-title">Resting ECG Results</div>
+                                            <table>
+                                                <tr><td>Normal</td><td>No abnormal electrical activity detected</td></tr>
+                                                <tr><td>ST-T</td><td>ST-T Wave Abnormality – May suggest heart stress</td></tr>
+                                                <tr><td>LVH</td><td>Left Ventricular Hypertrophy – Enlarged heart muscle</td></tr>
+                                            </table>
+                                        </div>
+                                    </span>
+                                </div>
                                 <select name="resting_ecg" required>
                                     <option value="0" {% if form.resting_ecg == '0' %}selected{% endif %}>Left ventricular hypertrophy</option>
                                     <option value="1" {% if form.resting_ecg == '1' %}selected{% endif %}>Normal</option>
@@ -158,18 +221,52 @@
                                 <input type="number" name="max_hr" value="{{ form.max_hr }}" min="60" max="220" placeholder="Max heart rate" required>
                             </label>
                             <label>
-                                Exercise-Induced Angina
+                                <div class="field-label-row">
+                                    Exercise-Induced Angina
+                                    <span class="info-icon" tabindex="0" aria-label="Exercise Angina guide">ℹ
+                                        <div class="info-tooltip">
+                                            <div class="info-tooltip-title">Exercise-Induced Angina</div>
+                                            <p><strong>No</strong> – No chest pain, pressure, or discomfort when walking, climbing stairs, or doing physical work.</p>
+                                            <p><strong>Yes</strong> – Chest pain, tightness, burning, or discomfort during physical activity that improves with rest.</p>
+                                        </div>
+                                    </span>
+                                </div>
                                 <select name="exercise_angina" required>
                                     <option value="0" {% if form.exercise_angina == '0' %}selected{% endif %}>No</option>
                                     <option value="1" {% if form.exercise_angina == '1' %}selected{% endif %}>Yes</option>
                                 </select>
                             </label>
                             <label>
-                                ST Depression (Oldpeak)
+                                <div class="field-label-row">
+                                    ST Depression (Oldpeak)
+                                    <span class="info-icon" tabindex="0" aria-label="Oldpeak guide">ℹ
+                                        <div class="info-tooltip">
+                                            <div class="info-tooltip-title">S.T. Depression (Oldpeak)</div>
+                                            <table>
+                                                <tr><td>0.0</td><td>Normal / No ST depression</td></tr>
+                                                <tr><td>0.5–1.0</td><td>Mild ST depression</td></tr>
+                                                <tr><td>1.0–2.0</td><td>Moderate ST depression</td></tr>
+                                                <tr><td>&gt; 2.0</td><td>Significant ST depression</td></tr>
+                                            </table>
+                                        </div>
+                                    </span>
+                                </div>
                                 <input type="number" step="0.1" name="oldpeak" value="{{ form.oldpeak }}" min="0" max="10" placeholder="ST depression" required>
                             </label>
                             <label>
-                                ST Slope
+                                <div class="field-label-row">
+                                    ST Slope
+                                    <span class="info-icon" tabindex="0" aria-label="ST Slope guide">ℹ
+                                        <div class="info-tooltip">
+                                            <div class="info-tooltip-title">ST Slope</div>
+                                            <table>
+                                                <tr><td>Up</td><td>Upsloping – ST line goes upward (generally favorable)</td></tr>
+                                                <tr><td>Flat</td><td>Flat – ST line stays level</td></tr>
+                                                <tr><td>Down</td><td>Downsloping – ST line goes downward (concerning)</td></tr>
+                                            </table>
+                                        </div>
+                                    </span>
+                                </div>
                                 <select name="st_slope" required>
                                     <option value="0" {% if form.st_slope == '0' %}selected{% endif %}>Downsloping</option>
                                     <option value="1" {% if form.st_slope == '1' %}selected{% endif %}>Flat</option>

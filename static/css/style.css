@@ -1647,3 +1647,119 @@ ul {
         form label:nth-child(9) { animation-delay: 0.9s; }
         form label:nth-child(10) { animation-delay: 1.0s; }
         form label:nth-child(11) { animation-delay: 1.1s; }
+
+/* ===== Info Icon Tooltip ===== */
+.field-label-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-weight: 500;
+    color: #fff;
+    font-size: 0.95rem;
+    margin-bottom: 2px;
+}
+
+.info-icon {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgba(59, 130, 246, 0.25);
+    border: 1.5px solid rgba(59, 130, 246, 0.55);
+    color: #93c5fd;
+    font-size: 0.7rem;
+    font-weight: 700;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.2s, border-color 0.2s;
+    outline: none;
+    font-style: normal;
+    user-select: none;
+    line-height: 1;
+}
+
+.info-icon:hover,
+.info-icon:focus {
+    background: rgba(59, 130, 246, 0.45);
+    border-color: #60a5fa;
+    color: #fff;
+}
+
+.info-tooltip {
+    display: none;
+    position: absolute;
+    left: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 9999;
+    background: rgba(8, 18, 52, 0.98);
+    border: 1px solid rgba(59, 130, 246, 0.35);
+    border-radius: 14px;
+    padding: 14px 16px;
+    width: 280px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(12px);
+    pointer-events: none;
+}
+
+.info-icon:hover .info-tooltip,
+.info-icon:focus .info-tooltip {
+    display: block;
+}
+
+.info-tooltip-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #93c5fd;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+    padding-bottom: 6px;
+}
+
+.info-tooltip table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+    line-height: 1.5;
+}
+
+.info-tooltip table tr td {
+    padding: 4px 6px 4px 0;
+    color: #e2e8f0;
+    vertical-align: top;
+}
+
+.info-tooltip table tr td:first-child {
+    font-weight: 600;
+    color: #93c5fd;
+    white-space: nowrap;
+    padding-right: 10px;
+    min-width: 80px;
+}
+
+.info-tooltip p {
+    font-size: 0.8rem;
+    color: #e2e8f0;
+    margin: 3px 0;
+    line-height: 1.55;
+}
+
+.info-tooltip p strong {
+    color: #93c5fd;
+}
+
+/* Flip tooltip to left if near right edge */
+@media (max-width: 640px) {
+    .info-tooltip {
+        left: auto;
+        right: 24px;
+        top: 28px;
+        transform: none;
+        width: 220px;
+    }
+}

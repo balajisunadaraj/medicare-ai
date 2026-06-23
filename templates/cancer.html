@@ -164,7 +164,21 @@
                             </label>
 
                             <label>
-                                Energy level
+                                <div class="field-label-row">
+                                    Energy level
+                                    <span class="info-icon" tabindex="0" aria-label="Energy Level guide">ℹ
+                                        <div class="info-tooltip">
+                                            <div class="info-tooltip-title">Energy Level (0–100)</div>
+                                            <table>
+                                                <tr><td>1–20</td><td>Very Low – Constant fatigue, difficulty with daily tasks</td></tr>
+                                                <tr><td>21–40</td><td>Low – Frequently tired, reduced stamina</td></tr>
+                                                <tr><td>41–60</td><td>Moderate – Average energy for daily tasks</td></tr>
+                                                <tr><td>61–80</td><td>High – Active, good stamina, rarely tired</td></tr>
+                                                <tr><td>81–100</td><td>Very High – Excellent energy, highly active</td></tr>
+                                            </table>
+                                        </div>
+                                    </span>
+                                </div>
                                 <input type="number" name="ENERGY_LEVEL" value="{{ cancer_form.ENERGY_LEVEL }}" min="0" max="100" placeholder="Energy level" required>
                             </label>
 
@@ -251,11 +265,22 @@
                         {% endif %}
                     </div>
 
-                    <script>
+                    <div id="cancer-chart-inline-wrapper" style="{% if not cancer_result %}display:none;{% endif %} margin-top:28px;">
+                        <div class="chart-card">
+                            <h3>Prediction Probability</h3>
+                            <div class="chart-wrapper" style="position:relative;height:300px;width:100%;">
+                                <canvas id="cancerResultPieChart2"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                <script>
                         document.addEventListener('DOMContentLoaded', function () {
                             const form = document.getElementById('cancerForm');
                             const resultWrapper = document.getElementById('cancer-prediction-result-wrapper');
-                            let cancerPieChart = null;
+                            const inlineChartWrapper = document.getElementById('cancer-chart-inline-wrapper');
+                            let cancerPieChart2 = null;
+                            let cancerPieChartLeft = null;
 
                             function escapeHtml(value) {
                                 const div = document.createElement('div');
@@ -263,16 +288,12 @@
                                 return div.innerHTML;
                             }
 
-                            function drawCancerPieChart(probability) {
-                                const canvas = document.getElementById('cancerResultPieChart');
-                                if (!canvas || typeof Chart === 'undefined') return;
+                            function drawCancerPieChart(probability, canvasId, chartRef) {
+                                const canvas = document.getElementById(canvasId);
+                                if (!canvas || typeof Chart === 'undefined') return null;
                                 const pieProbability = probability || { risk: 50, no_risk: 50 };
-
-                                if (cancerPieChart) {
-                                    cancerPieChart.destroy();
-                                }
-
-                                cancerPieChart = new Chart(canvas, {
+                                if (chartRef) { chartRef.destroy(); }
+                                return new Chart(canvas, {
                                     type: 'doughnut',
                                     data: {
                                         labels: ['Cancer Risk', 'No Cancer Risk'],
@@ -294,21 +315,45 @@
                             }
 
                             function showCancerResult(result) {
+                                // Show result text
                                 resultWrapper.innerHTML = `
                                     <div class="card result-box" style="margin-top:28px;padding:24px;border-radius:22px;">
                                         <h3 style="margin-bottom:10px;color:white;">${escapeHtml(result.label)}</h3>
                                         <p style="color:var(--gray-200);">${escapeHtml(result.message)}</p>
                                     </div>`;
-                                const chartWrapper = document.getElementById('cancer-chart-card-wrapper');
-                                if (chartWrapper) {
-                                    chartWrapper.style.display = 'block';
+
+                                // Show left-panel chart
+                                const leftChartWrapper = document.getElementById('cancer-chart-card-wrapper');
+                                if (leftChartWrapper) {
+                                    leftChartWrapper.style.display = 'block';
                                 }
-                                drawCancerPieChart(result.probability);
+                                cancerPieChartLeft = drawCancerPieChart(result.probability, 'cancerResultPieChart', cancerPieChartLeft);
+
+                                // Show inline chart below result
+                                if (inlineChartWrapper) {
+                                    inlineChartWrapper.style.display = 'block';
+                                    setTimeout(() => {
+                                        cancerPieChart2 = drawCancerPieChart(result.probability, 'cancerResultPieChart2', cancerPieChart2);
+                                    }, 100);
+                                }
+
+                                // Scroll to result
+                                setTimeout(() => {
+                                    const navbarHeight = document.querySelector('.navbar')?.offsetHeight || 0;
+                                    const targetY = resultWrapper.getBoundingClientRect().top + window.pageYOffset - navbarHeight - 16;
+                                    window.scrollTo({ top: targetY, behavior: 'smooth' });
+                                }, 150);
                             }
 
                             const initialResult = {{ cancer_result|default(None)|tojson|safe }};
                             if (initialResult) {
-                                drawCancerPieChart(initialResult.probability);
+                                cancerPieChartLeft = drawCancerPieChart(initialResult.probability, 'cancerResultPieChart', null);
+                                if (inlineChartWrapper) {
+                                    inlineChartWrapper.style.display = 'block';
+                                    setTimeout(() => {
+                                        cancerPieChart2 = drawCancerPieChart(initialResult.probability, 'cancerResultPieChart2', null);
+                                    }, 100);
+                                }
                             }
 
                             if (!form) return;
@@ -328,10 +373,6 @@
                                         throw new Error(json.message || 'Prediction request failed');
                                     }
                                     showCancerResult(json);
-                                    // scroll to result (account for fixed navbar)
-                                    const navbarHeight = document.querySelector('.navbar')?.offsetHeight || 0;
-                                    const targetY = resultWrapper.getBoundingClientRect().top + window.pageYOffset - navbarHeight;
-                                    window.scrollTo({ top: targetY, behavior: 'smooth' });
                                 } catch (err) {
                                     resultWrapper.innerHTML = `\n                                        <div class="card result-box" style="margin-top:28px;padding:24px;border-radius:22px;">\n                                            <h3 style="margin-bottom:10px;color:white;">Error</h3>\n                                            <p style="color:var(--gray-200);">Unable to get prediction. Please try again.</p>\n                                        </div>`;
                                 }
