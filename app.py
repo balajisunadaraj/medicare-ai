@@ -698,6 +698,7 @@ def profile():
 
     if request.method == "POST":
         action = request.form.get("auth_action")
+        is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
 
         if action == "register":
             email = request.form.get("email", "").strip().lower()
@@ -714,7 +715,12 @@ def profile():
                 db.session.add(user)
                 db.session.commit()
                 login_user(user)
+                if is_ajax:
+                    return jsonify({"success": True, "message": "Registration successful!"})
                 return redirect(url_for("profile"))
+            # If we reach here, there's a validation error
+            if is_ajax:
+                return jsonify({"success": False, "message": auth_message})
 
         elif action == "login":
             email = request.form.get("email", "").strip().lower()
@@ -722,8 +728,12 @@ def profile():
             user = User.query.filter_by(email=email).first()
             if user and check_password_hash(user.password_hash, password):
                 login_user(user)
+                if is_ajax:
+                    return jsonify({"success": True, "message": "Login successful!"})
                 return redirect(url_for("profile"))
             auth_message = "Invalid email or password."
+            if is_ajax:
+                return jsonify({"success": False, "message": auth_message})
 
         elif action == "profile":
             if not current_user.is_authenticated:

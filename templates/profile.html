@@ -57,16 +57,19 @@
                 </p>
             </div>
 
+            <!-- Auth message area (AJAX-updated) -->
+            <div id="auth-message-wrapper">
             {% if auth_message %}
-            <div class="profile-panel" style="margin-bottom: 24px; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.18);">
-                <p style="color: #fee2e2; padding: 18px; font-weight: 600;">{{ auth_message }}</p>
+            <div class="profile-panel" style="margin-bottom:24px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.18);">
+                <p style="color:#fee2e2;padding:18px;font-weight:600;">{{ auth_message }}</p>
             </div>
             {% endif %}
+            </div>
 
             {% if current_user.is_authenticated %}
             <div class="profile-grid">
                 <div class="profile-panel">
-                    <form method="post" novalidate class="auth-form">
+                    <form method="post" novalidate class="auth-form" id="profileForm">
                         <input type="hidden" name="auth_action" value="profile">
                         <div class="form-group">
                             <label>Age</label>
@@ -89,7 +92,8 @@
                         </div>
                         <div class="form-group">
                             <label>Resting Blood Pressure (mm Hg)</label>
-                            <input type="number" name="resting_bp" value="{{ form.resting_bp }}" min="80" max="200" placeholder="Resting blood pressure" required>
+                            <input type="number" name="resting_bp" id="restingBpInput" value="{{ form.resting_bp }}" min="80" max="200" placeholder="Resting blood pressure" required>
+                            <p id="bp-caption" class="field-hint" style="margin-top:6px;font-size:0.82rem;"></p>
                         </div>
                         <div class="form-group">
                             <label>Cholesterol (mg/dL)</label>
@@ -111,8 +115,11 @@
                             <input type="number" name="sleep_hours" value="{{ form.sleep_hours }}" min="0" max="12" placeholder="Sleep hours" required>
                         </div>
                         <div class="form-group">
-                            <label>Stress Level (1-10)</label>
-                            <input type="number" name="stress_level" value="{{ form.stress_level }}" min="1" max="10" placeholder="Stress level" required>
+                            <div class="field-label-row">
+                                <label style="margin:0;">Stress Level (1–10)</label>
+                                <span class="info-icon" tabindex="0" id="stressInfoIcon" aria-label="Stress level guide" style="cursor:pointer;">&#8505;</span>
+                            </div>
+                            <input type="number" name="stress_level" id="stressLevelInput" value="{{ form.stress_level }}" min="1" max="10" placeholder="Stress level 1-10" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Save Profile</button>
                     </form>
@@ -127,10 +134,19 @@
 
                     <div class="profile-metrics-inline">
                         {% for metric in dashboard.metrics %}
-                        <div class="profile-metric-item">
+                        <div class="profile-metric-item" id="metric-{{ loop.index }}">
                             <span>{{ metric.label }}</span>
                             <strong>{{ metric.value }}</strong>
                             <p>{{ metric.note }}</p>
+                            {% if metric.label == 'BMI' %}
+                            <p id="bmi-suggestion" class="metric-suggestion" style="margin-top:6px;font-size:0.8rem;font-weight:600;"></p>
+                            {% endif %}
+                            {% if metric.label == 'Blood Pressure' %}
+                            <p id="bp-metric-caption" class="metric-suggestion" style="margin-top:6px;font-size:0.8rem;font-weight:600;"></p>
+                            {% endif %}
+                            {% if metric.label == 'Weekly Activity' %}
+                            <div id="health-suggestions" style="margin-top:12px;"></div>
+                            {% endif %}
                         </div>
                         {% endfor %}
                     </div>
@@ -140,10 +156,12 @@
                 </div>
             </div>
             {% else %}
+            <!-- Login / Register panels with AJAX -->
             <div class="profile-grid">
                 <div class="profile-panel">
                     <h3>Login</h3>
-                    <form method="post" novalidate class="auth-form">
+                    <div id="login-message" style="display:none;margin-bottom:14px;padding:12px 16px;border-radius:10px;font-size:0.9rem;font-weight:600;"></div>
+                    <form novalidate class="auth-form" id="loginForm">
                         <input type="hidden" name="auth_action" value="login">
                         <div class="form-group">
                             <label>Email</label>
@@ -153,13 +171,14 @@
                             <label>Password</label>
                             <input type="password" name="password" placeholder="Password" required>
                         </div>
-                        <button type="submit" class="btn btn-primary">Login</button>
+                        <button type="submit" class="btn btn-primary" id="loginBtn">Login</button>
                     </form>
                 </div>
 
                 <div class="profile-panel">
                     <h3>Sign Up</h3>
-                    <form method="post" novalidate class="auth-form">
+                    <div id="register-message" style="display:none;margin-bottom:14px;padding:12px 16px;border-radius:10px;font-size:0.9rem;font-weight:600;"></div>
+                    <form novalidate class="auth-form" id="registerForm">
                         <input type="hidden" name="auth_action" value="register">
                         <div class="form-group">
                             <label>Email</label>
@@ -173,7 +192,7 @@
                             <label>Confirm Password</label>
                             <input type="password" name="confirm_password" placeholder="Confirm password" required>
                         </div>
-                        <button type="submit" class="btn btn-primary">Sign Up</button>
+                        <button type="submit" class="btn btn-primary" id="registerBtn">Sign Up</button>
                     </form>
                 </div>
             </div>
@@ -295,6 +314,215 @@
             </div>
         </div>
     </footer>
+
+    <!-- Stress Level Info Tooltip -->
+    <div id="stressTip" class="global-field-tip" role="tooltip" style="display:none;">
+        <div class="info-tooltip-title">Stress Level Guide</div>
+        <table>
+            <tr><td>1</td><td>Completely relaxed &ndash; No stress at all</td></tr>
+            <tr><td>2&ndash;3</td><td>Mild stress &ndash; Easily manageable</td></tr>
+            <tr><td>4&ndash;5</td><td>Moderate stress &ndash; Noticeable but manageable</td></tr>
+            <tr><td>6&ndash;7</td><td>High stress &ndash; Affecting daily tasks</td></tr>
+            <tr><td>8&ndash;9</td><td>Very high stress &ndash; Significant impact on health</td></tr>
+            <tr><td>10</td><td>Extremely stressed &ndash; Seek professional support</td></tr>
+        </table>
+        <p style="margin-top:8px;">Enter a number from <strong>1</strong> (fully relaxed) to <strong>10</strong> (extremely stressed).</p>
+    </div>
+
+    <script>
+    (function () {
+        // ── 1. Blood Pressure live caption ──────────────────────────────────
+        function getBpCaption(bp) {
+            bp = parseInt(bp, 10);
+            if (isNaN(bp) || bp <= 0) return { text: '', color: '' };
+            if (bp <= 120) return { text: '✅ Normal (90–120 mmHg) — Healthy range', color: '#4ade80' };
+            if (bp <= 129) return { text: '⚠️ Elevated (120–129 mmHg) — Monitor diet & activity', color: '#fbbf24' };
+            if (bp <= 139) return { text: '🔶 High BP Stage 1 (130–139 mmHg) — Consult a doctor', color: '#f97316' };
+            return { text: '🔴 High BP Stage 2 (≥ 140 mmHg) — Seek medical attention', color: '#ef4444' };
+        }
+
+        const bpInput = document.getElementById('restingBpInput');
+        const bpCaption = document.getElementById('bp-caption');
+        if (bpInput && bpCaption) {
+            function updateBpCaption() {
+                const cap = getBpCaption(bpInput.value);
+                bpCaption.textContent = cap.text;
+                bpCaption.style.color = cap.color;
+            }
+            bpInput.addEventListener('input', updateBpCaption);
+            updateBpCaption();
+        }
+
+        // ── 2. BMI suggestion + BP metric caption + health suggestions ──────
+        function bmiSuggestion(bmi) {
+            bmi = parseFloat(bmi);
+            if (isNaN(bmi) || bmi <= 0) return null;
+            if (bmi < 18.5) return { text: '⬆ Underweight — Consider gaining weight with a nutritious diet.', color: '#60a5fa' };
+            if (bmi < 25) return { text: '✅ Healthy BMI — Keep maintaining your current weight.', color: '#4ade80' };
+            if (bmi < 30) return { text: '⬇ Overweight — Consider reducing weight through diet & exercise.', color: '#fbbf24' };
+            return { text: '⬇ Obese — Reducing weight significantly can lower your health risks.', color: '#ef4444' };
+        }
+
+        function healthSuggestions(metrics) {
+            const suggestions = [];
+            const bmi   = parseFloat(metrics.bmi);
+            const bp    = parseInt(metrics.bp, 10);
+            const chol  = parseInt(metrics.chol, 10);
+            const bs    = parseInt(metrics.bs, 10);
+            const ex    = parseInt(metrics.ex, 10);
+            const sleep = parseInt(metrics.sleep, 10);
+            const stress = parseInt(metrics.stress, 10);
+
+            if (bp >= 130) suggestions.push({ icon: '💊', text: 'Reduce sodium intake and consider consulting your doctor about blood pressure management.' });
+            else suggestions.push({ icon: '💓', text: 'Your blood pressure is in the healthy range — keep staying active and hydrated.' });
+
+            if (chol >= 200) suggestions.push({ icon: '🥗', text: 'High cholesterol detected. Include more fiber, fruits, and omega-3 rich foods in your diet.' });
+            else suggestions.push({ icon: '🥦', text: 'Your cholesterol level looks good — maintain a heart-healthy diet to keep it that way.' });
+
+            if (ex < 150) suggestions.push({ icon: '🏃', text: 'You\'re below the recommended 150 minutes of exercise per week. Try adding short walks or yoga sessions.' });
+            else suggestions.push({ icon: '🏋️', text: 'Great activity level! Keep up the regular exercise to maintain your cardiovascular health.' });
+
+            if (sleep < 6 || sleep > 9) suggestions.push({ icon: '😴', text: 'Your sleep is outside the optimal 6–9 hours. Try creating a consistent bedtime routine.' });
+
+            if (stress >= 7) suggestions.push({ icon: '🧘', text: 'High stress detected. Practice mindfulness, deep breathing, or talk to a mental health professional.' });
+
+            if (bmi >= 25) suggestions.push({ icon: '⚖️', text: 'Consider a balanced diet and regular aerobic activity to work towards a healthy BMI.' });
+            if (bs === 1) suggestions.push({ icon: '🩸', text: 'High fasting blood sugar. Monitor carbohydrate intake and speak with your doctor about diabetes risk.' });
+
+            return suggestions.slice(0, 3);
+        }
+
+        // Inject dashboard data from Jinja (only present when dashboard is truthy)
+        const dashboardData = {
+            bmi:    "{{ dashboard.bmi if dashboard else '' }}",
+            bp:     "{{ form.resting_bp }}",
+            chol:   "{{ form.cholesterol }}",
+            bs:     "{{ form.fasting_bs }}",
+            ex:     "{{ form.exercise_minutes }}",
+            sleep:  "{{ form.sleep_hours }}",
+            stress: "{{ form.stress_level }}"
+        };
+
+        const bmiEl = document.getElementById('bmi-suggestion');
+        if (bmiEl && dashboardData.bmi) {
+            const s = bmiSuggestion(dashboardData.bmi);
+            if (s) { bmiEl.textContent = s.text; bmiEl.style.color = s.color; }
+        }
+
+        const bpMetricCaption = document.getElementById('bp-metric-caption');
+        if (bpMetricCaption && dashboardData.bp) {
+            const cap = getBpCaption(dashboardData.bp);
+            bpMetricCaption.textContent = cap.text;
+            bpMetricCaption.style.color = cap.color;
+        }
+
+        const suggestionsEl = document.getElementById('health-suggestions');
+        if (suggestionsEl && dashboardData.bmi) {
+            const suggs = healthSuggestions(dashboardData);
+            if (suggs.length) {
+                suggestionsEl.innerHTML = '<p style="font-size:0.78rem;color:#93c5fd;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Health Suggestions</p>' +
+                    suggs.map(s => `<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:8px;font-size:0.82rem;color:#e2e8f0;line-height:1.5;">
+                        <span style="font-size:1rem;flex-shrink:0;">${s.icon}</span>
+                        <span>${s.text}</span>
+                    </div>`).join('');
+            }
+        }
+
+        // ── 3. Stress Level tooltip ─────────────────────────────────────────
+        const stressIcon = document.getElementById('stressInfoIcon');
+        const stressTip  = document.getElementById('stressTip');
+        let stressHideTimer = null;
+
+        function positionStressTip() {
+            if (!stressIcon || !stressTip) return;
+            const rect = stressIcon.getBoundingClientRect();
+            const tipW = 310;
+            const tipH = stressTip.offsetHeight || 220;
+            const vw = window.innerWidth;
+            const vh = window.innerHeight;
+            let left = rect.right + 10;
+            if (left + tipW > vw - 12) left = rect.left - tipW - 10;
+            if (left < 8) left = 8;
+            let top = rect.top + rect.height / 2 - tipH / 2;
+            if (top < 8) top = 8;
+            if (top + tipH > vh - 8) top = vh - tipH - 8;
+            stressTip.style.left = left + 'px';
+            stressTip.style.top  = top + 'px';
+        }
+
+        if (stressIcon && stressTip) {
+            stressIcon.addEventListener('mouseenter', () => {
+                clearTimeout(stressHideTimer);
+                stressTip.style.display = 'block';
+                positionStressTip();
+            });
+            stressIcon.addEventListener('focus', () => {
+                clearTimeout(stressHideTimer);
+                stressTip.style.display = 'block';
+                positionStressTip();
+            });
+            stressIcon.addEventListener('mouseleave', () => {
+                stressHideTimer = setTimeout(() => { stressTip.style.display = 'none'; }, 80);
+            });
+            stressIcon.addEventListener('blur', () => {
+                stressHideTimer = setTimeout(() => { stressTip.style.display = 'none'; }, 80);
+            });
+        }
+
+        // ── 4. AJAX Login / Register (no page refresh) ──────────────────────
+        function showAuthMessage(elementId, message, isError) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            el.textContent = message;
+            el.style.display = 'block';
+            el.style.background = isError ? 'rgba(239,68,68,0.15)' : 'rgba(34,197,94,0.15)';
+            el.style.border = isError ? '1px solid rgba(239,68,68,0.4)' : '1px solid rgba(34,197,94,0.4)';
+            el.style.color = isError ? '#fca5a5' : '#86efac';
+        }
+
+        async function handleAuthForm(formEl, msgId, btnEl) {
+            if (!formEl) return;
+            formEl.addEventListener('submit', async function (e) {
+                e.preventDefault();
+                const originalText = btnEl.textContent;
+                btnEl.disabled = true;
+                btnEl.textContent = 'Please wait…';
+                try {
+                    const resp = await fetch('/profile', {
+                        method: 'POST',
+                        body: new FormData(formEl),
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+                    const json = await resp.json();
+                    if (json.success) {
+                        // Redirect to profile on success
+                        window.location.href = '/profile';
+                    } else {
+                        showAuthMessage(msgId, json.message || 'An error occurred. Please try again.', true);
+                        btnEl.disabled = false;
+                        btnEl.textContent = originalText;
+                    }
+                } catch (err) {
+                    showAuthMessage(msgId, 'Network error. Please try again.', true);
+                    btnEl.disabled = false;
+                    btnEl.textContent = originalText;
+                }
+            });
+        }
+
+        handleAuthForm(
+            document.getElementById('loginForm'),
+            'login-message',
+            document.getElementById('loginBtn')
+        );
+        handleAuthForm(
+            document.getElementById('registerForm'),
+            'register-message',
+            document.getElementById('registerBtn')
+        );
+    })();
+    </script>
+
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
