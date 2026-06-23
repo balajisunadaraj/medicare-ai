@@ -122,83 +122,83 @@
                                 </select>
                             </label>
                             <label>
-                                Chest Pain Type
-                                <div class="input-icon-wrapper">
+                                <div class="field-label-row">
+                                    <span>Chest Pain Type</span>
                                     <span class="info-icon" tabindex="0" data-tip-id="chest_pain" aria-label="Chest Pain Type info">ℹ</span>
-                                    <select name="chest_pain" required>
-                                        <option value="0" {% if form.chest_pain == '0' %}selected{% endif %}>Asymptomatic</option>
-                                        <option value="1" {% if form.chest_pain == '1' %}selected{% endif %}>Atypical Angina</option>
-                                        <option value="2" {% if form.chest_pain == '2' %}selected{% endif %}>Non-anginal Pain</option>
-                                        <option value="3" {% if form.chest_pain == '3' %}selected{% endif %}>Typical Angina</option>
-                                    </select>
                                 </div>
+                                <select name="chest_pain" required>
+                                    <option value="0" {% if form.chest_pain == '0' %}selected{% endif %}>Asymptomatic</option>
+                                    <option value="1" {% if form.chest_pain == '1' %}selected{% endif %}>Atypical Angina</option>
+                                    <option value="2" {% if form.chest_pain == '2' %}selected{% endif %}>Non-anginal Pain</option>
+                                    <option value="3" {% if form.chest_pain == '3' %}selected{% endif %}>Typical Angina</option>
+                                </select>
                             </label>
                             <label>
-                                Resting Blood Pressure (mm Hg)
-                                <div class="input-icon-wrapper">
+                                <div class="field-label-row">
+                                    <span>Resting Blood Pressure (mm Hg)</span>
                                     <span class="info-icon" tabindex="0" data-tip-id="resting_bp" aria-label="Resting BP info">ℹ</span>
-                                    <input type="number" name="resting_bp" value="{{ form.resting_bp }}" min="80" max="240" placeholder="Resting BP" required>
                                 </div>
+                                <input type="number" name="resting_bp" value="{{ form.resting_bp }}" min="80" max="240" placeholder="Resting BP" required>
                             </label>
                             <label>
-                                Cholesterol (mg/dL)
-                                <div class="input-icon-wrapper">
+                                <div class="field-label-row">
+                                    <span>Cholesterol (mg/dL)</span>
                                     <span class="info-icon" tabindex="0" data-tip-id="cholesterol" aria-label="Cholesterol info">ℹ</span>
-                                    <input type="number" name="cholesterol" value="{{ form.cholesterol }}" min="100" max="450" placeholder="Cholesterol level" required>
                                 </div>
+                                <input type="number" name="cholesterol" value="{{ form.cholesterol }}" min="100" max="450" placeholder="Cholesterol level" required>
                             </label>
                             <label>
-                                Fasting Blood Sugar &gt; 120 mg/dL
-                                <div class="input-icon-wrapper">
+                                <div class="field-label-row">
+                                    <span>Fasting Blood Sugar &gt; 120 mg/dL</span>
                                     <span class="info-icon" tabindex="0" data-tip-id="fasting_bs" aria-label="Fasting Blood Sugar info">ℹ</span>
-                                    <select name="fasting_bs" required>
-                                        <option value="0" {% if form.fasting_bs == '0' %}selected{% endif %}>No</option>
-                                        <option value="1" {% if form.fasting_bs == '1' %}selected{% endif %}>Yes</option>
-                                    </select>
                                 </div>
+                                <select name="fasting_bs" required>
+                                    <option value="0" {% if form.fasting_bs == '0' %}selected{% endif %}>No</option>
+                                    <option value="1" {% if form.fasting_bs == '1' %}selected{% endif %}>Yes</option>
+                                </select>
                             </label>
                             <label>
-                                Resting ECG
-                                <div class="input-icon-wrapper">
+                                <div class="field-label-row">
+                                    <span>Resting ECG</span>
                                     <span class="info-icon" tabindex="0" data-tip-id="resting_ecg" aria-label="Resting ECG info">ℹ</span>
-                                    <select name="resting_ecg" required>
-                                        <option value="0" {% if form.resting_ecg == '0' %}selected{% endif %}>Left ventricular hypertrophy</option>
-                                        <option value="1" {% if form.resting_ecg == '1' %}selected{% endif %}>Normal</option>
-                                        <option value="2" {% if form.resting_ecg == '2' %}selected{% endif %}>ST-T wave abnormality</option>
-                                    </select>
                                 </div>
+                                <select name="resting_ecg" required>
+                                    <option value="0" {% if form.resting_ecg == '0' %}selected{% endif %}>Left ventricular hypertrophy</option>
+                                    <option value="1" {% if form.resting_ecg == '1' %}selected{% endif %}>Normal</option>
+                                    <option value="2" {% if form.resting_ecg == '2' %}selected{% endif %}>ST-T wave abnormality</option>
+                                </select>
                             </label>
                             <label>
                                 Max Heart Rate Achieved
                                 <input type="number" name="max_hr" value="{{ form.max_hr }}" min="60" max="220" placeholder="Max heart rate" required>
                             </label>
                             <label>
-                                Exercise-Induced Angina
-                                <div class="input-icon-wrapper">
+                                <div class="field-label-row">
+                                    <span>Exercise-Induced Angina</span>
                                     <span class="info-icon" tabindex="0" data-tip-id="exercise_angina" aria-label="Exercise Angina info">ℹ</span>
-                                    <select name="exercise_angina" required>
-                                        <option value="0" {% if form.exercise_angina == '0' %}selected{% endif %}>No</option>
-                                        <option value="1" {% if form.exercise_angina == '1' %}selected{% endif %}>Yes</option>
-                                    </select>
                                 </div>
+                                <select name="exercise_angina" required>
+                                    <option value="0" {% if form.exercise_angina == '0' %}selected{% endif %}>No</option>
+                                    <option value="1" {% if form.exercise_angina == '1' %}selected{% endif %}>Yes</option>
+                                </select>
                             </label>
                             <label>
-                                ST Depression (Oldpeak)
-                                <div class="input-icon-wrapper">
+                                <div class="field-label-row">
+                                    <span>ST Depression (Oldpeak)</span>
                                     <span class="info-icon" tabindex="0" data-tip-id="oldpeak" aria-label="Oldpeak info">ℹ</span>
-                                    <input type="number" step="0.1" name="oldpeak" value="{{ form.oldpeak }}" min="0" max="10" placeholder="ST depression" required>
                                 </div>
+                                <input type="number" step="0.1" name="oldpeak" value="{{ form.oldpeak }}" min="0" max="10" placeholder="ST depression" required>
                             </label>
                             <label>
-                                ST Slope
-                                <div class="input-icon-wrapper">
+                                <div class="field-label-row">
+                                    <span>ST Slope</span>
                                     <span class="info-icon" tabindex="0" data-tip-id="st_slope" aria-label="ST Slope info">ℹ</span>
-                                    <select name="st_slope" required>
-                                        <option value="0" {% if form.st_slope == '0' %}selected{% endif %}>Downsloping</option>
-                                        <option value="1" {% if form.st_slope == '1' %}selected{% endif %}>Flat</option>
-                                        <option value="2" {% if form.st_slope == '2' %}selected{% endif %}>Upsloping</option>
-                                    </select>
                                 </div>
+                                <select name="st_slope" required>
+                                    <option value="0" {% if form.st_slope == '0' %}selected{% endif %}>Downsloping</option>
+                                    <option value="1" {% if form.st_slope == '1' %}selected{% endif %}>Flat</option>
+                                    <option value="2" {% if form.st_slope == '2' %}selected{% endif %}>Upsloping</option>
+                                </select>
                             </label>
                         </div>
 

@@ -95,15 +95,6 @@
                     <div style="margin-top:32px;padding:20px;border-radius:18px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.18);">
                         <strong>Important:</strong> This tool is not a substitute for professional medical evaluation. Use it only as an informational guide.
                     </div>
-
-                    <div id="cancer-chart-card-wrapper" style="{% if not cancer_result %}display:none;{% endif %} margin-top:28px;">
-                        <div class="chart-card">
-                            <h3>Prediction Probability</h3>
-                            <div class="chart-wrapper" style="position:relative;height:300px;width:100%;">
-                                <canvas id="cancerResultPieChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="predict-panel">
@@ -164,11 +155,11 @@
                             </label>
 
                             <label>
-                                Energy level
-                                <div class="input-icon-wrapper">
+                                <div class="field-label-row">
+                                    <span>Energy level</span>
                                     <span class="info-icon" tabindex="0" data-tip-id="energy_level" aria-label="Energy Level info">ℹ</span>
-                                    <input type="number" name="ENERGY_LEVEL" value="{{ cancer_form.ENERGY_LEVEL }}" min="0" max="100" placeholder="Energy level" required>
                                 </div>
+                                <input type="number" name="ENERGY_LEVEL" value="{{ cancer_form.ENERGY_LEVEL }}" min="0" max="100" placeholder="Energy level" required>
                             </label>
 
                             <label>
