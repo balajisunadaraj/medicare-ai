@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Cancer risk prediction using a trained machine learning model. Enter your demographic and lifestyle inputs for a risk estimate.">
+    <meta name="description"
+        content="Cancer risk prediction using a trained machine learning model. Enter your demographic and lifestyle inputs for a risk estimate.">
     <title>Cancer Prediction | MediCare AI</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
 
     <div class="bg-particles" aria-hidden="true">
@@ -50,7 +53,7 @@
                     Provide your demographic and lifestyle details below for a model-based cancer risk estimate.
                 </p>
                 <div class="hero-buttons">
-                    <a href="/predict" class="btn btn-secondary">
+                    <a href="/predict_heart" class="btn btn-secondary">
                         Heart Prediction <span class="btn-icon">→</span>
                     </a>
                     <a href="#cancer-form" class="btn btn-primary">
@@ -67,7 +70,8 @@
                 <div class="section-label">Cancer Prediction</div>
                 <h2 class="section-title">Cancer Risk Assessment</h2>
                 <p class="section-subtitle">
-                    Use the personalized cancer prediction form below. The model uses your answers to estimate risk and save results for your profile.
+                    Use the personalized cancer prediction form below. The model uses your answers to estimate risk and
+                    save results for your profile.
                 </p>
             </div>
 
@@ -92,8 +96,10 @@
                         {% endfor %}
                     </ul>
 
-                    <div style="margin-top:32px;padding:20px;border-radius:18px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.18);">
-                        <strong>Important:</strong> This tool is not a substitute for professional medical evaluation. Use it only as an informational guide.
+                    <div
+                        style="margin-top:32px;padding:20px;border-radius:18px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.18);">
+                        <strong>Important:</strong> This tool is not a substitute for professional medical evaluation.
+                        Use it only as an informational guide.
                     </div>
 
                     <!-- Result card shown below precautions after prediction -->
@@ -107,7 +113,8 @@
                     </div>
 
                     <!-- Pie chart shown below result -->
-                    <div id="cancer-chart-card-wrapper" style="{% if not cancer_result %}display:none;{% endif %} margin-top:28px;">
+                    <div id="cancer-chart-card-wrapper"
+                        style="{% if not cancer_result %}display:none;{% endif %} margin-top:28px;">
                         <div class="chart-card">
                             <h3>Prediction Probability</h3>
                             <div class="chart-wrapper" style="position:relative;height:300px;width:100%;">
@@ -123,144 +130,178 @@
                         <div style="display:grid;gap:18px;">
                             <label>
                                 Age
-                                <input type="number" name="AGE" value="{{ cancer_form.age }}" min="1" max="120" placeholder="Age in years" required>
+                                <input type="number" name="AGE" value="{{ cancer_form.age }}" min="1" max="120"
+                                    placeholder="Age in years" required>
                             </label>
 
                             <label>
                                 Gender
                                 <select name="GENDER" required>
-                                    <option value="Female" {% if cancer_form.GENDER == 'Female' %}selected{% endif %}>Female</option>
-                                    <option value="Male" {% if cancer_form.GENDER == 'Male' %}selected{% endif %}>Male</option>
+                                    <option value="Female" {% if cancer_form.GENDER=='Female' %}selected{% endif %}>
+                                        Female</option>
+                                    <option value="Male" {% if cancer_form.GENDER=='Male' %}selected{% endif %}>Male
+                                    </option>
                                 </select>
                             </label>
 
                             <label>
                                 Smoking
                                 <select name="SMOKING" required>
-                                    <option value="No" {% if cancer_form.SMOKING == 'No' %}selected{% endif %}>No</option>
-                                    <option value="Yes" {% if cancer_form.SMOKING == 'Yes' %}selected{% endif %}>Yes</option>
+                                    <option value="No" {% if cancer_form.SMOKING=='No' %}selected{% endif %}>No</option>
+                                    <option value="Yes" {% if cancer_form.SMOKING=='Yes' %}selected{% endif %}>Yes
+                                    </option>
                                 </select>
                             </label>
-            
+
                             <label>
                                 Finger Discoloration
                                 <select name="FINGER_DISCOLORATION" required>
-                                    <option value="No" {% if cancer_form.FINGER_DISCOLORATION == 'No' %}selected{% endif %}>No</option>
-                                    <option value="Yes" {% if cancer_form.FINGER_DISCOLORATION == 'Yes' %}selected{% endif %}>Yes</option>
+                                    <option value="No" {% if cancer_form.FINGER_DISCOLORATION=='No' %}selected{% endif
+                                        %}>No</option>
+                                    <option value="Yes" {% if cancer_form.FINGER_DISCOLORATION=='Yes' %}selected{% endif
+                                        %}>Yes</option>
                                 </select>
                             </label>
-                            
+
                             <label>
                                 Mental Stress
                                 <select name="MENTAL_STRESS" required>
-                                    <option value="No" {% if cancer_form.MENTAL_STRESS == 'No' %}selected{% endif %}>No</option>
-                                    <option value="Yes" {% if cancer_form.MENTAL_STRESS == 'Yes' %}selected{% endif %}>Yes</option>
+                                    <option value="No" {% if cancer_form.MENTAL_STRESS=='No' %}selected{% endif %}>No
+                                    </option>
+                                    <option value="Yes" {% if cancer_form.MENTAL_STRESS=='Yes' %}selected{% endif %}>Yes
+                                    </option>
                                 </select>
                             </label>
 
                             <label>
                                 Exposure to Pollution
                                 <select name="EXPOSURE_TO_POLLUTION" required>
-                                    <option value="No" {% if cancer_form.EXPOSURE_TO_POLLUTION == 'No' %}selected{% endif %}>No</option>
-                                    <option value="Yes" {% if cancer_form.EXPOSURE_TO_POLLUTION == 'Yes' %}selected{% endif %}>Yes</option>
+                                    <option value="No" {% if cancer_form.EXPOSURE_TO_POLLUTION=='No' %}selected{% endif
+                                        %}>No</option>
+                                    <option value="Yes" {% if cancer_form.EXPOSURE_TO_POLLUTION=='Yes' %}selected{%
+                                        endif %}>Yes</option>
                                 </select>
                             </label>
 
                             <label>
                                 Long term illness
                                 <select name="LONG_TERM_ILLNESS" required>
-                                    <option value="No" {% if cancer_form.LONG_TERM_ILLNESS == 'No' %}selected{% endif %}>No</option>
-                                    <option value="Yes" {% if cancer_form.LONG_TERM_ILLNESS == 'Yes' %}selected{% endif %}>Yes</option>
+                                    <option value="No" {% if cancer_form.LONG_TERM_ILLNESS=='No' %}selected{% endif %}>
+                                        No</option>
+                                    <option value="Yes" {% if cancer_form.LONG_TERM_ILLNESS=='Yes' %}selected{% endif
+                                        %}>Yes</option>
                                 </select>
                             </label>
 
                             <label>
                                 <div class="field-label-row">
                                     <span>Energy level</span>
-                                    <span class="info-icon" tabindex="0" data-tip-id="energy_level" aria-label="Energy Level info">ℹ</span>
+                                    <span class="info-icon" tabindex="0" data-tip-id="energy_level"
+                                        aria-label="Energy Level info">ℹ</span>
                                 </div>
-                                <input type="number" name="ENERGY_LEVEL" value="{{ cancer_form.ENERGY_LEVEL }}" min="0" max="100" placeholder="Energy level" required>
+                                <input type="number" name="ENERGY_LEVEL" value="{{ cancer_form.ENERGY_LEVEL }}" min="0"
+                                    max="100" placeholder="Energy level" required>
                             </label>
 
                             <label>
                                 Immune weakness
                                 <select name="IMMUNE_WEAKNESS" required>
-                                    <option value="No" {% if cancer_form.IMMUNE_WEAKNESS == 'No' %}selected{% endif %}>No</option>
-                                    <option value="Yes" {% if cancer_form.IMMUNE_WEAKNESS == 'Yes' %}selected{% endif %}>Yes</option>
+                                    <option value="No" {% if cancer_form.IMMUNE_WEAKNESS=='No' %}selected{% endif %}>No
+                                    </option>
+                                    <option value="Yes" {% if cancer_form.IMMUNE_WEAKNESS=='Yes' %}selected{% endif %}>
+                                        Yes</option>
                                 </select>
                             </label>
 
                             <label>
                                 Breathing Issue
                                 <select name="BREATHING_ISSUE" required>
-                                    <option value="No" {% if cancer_form.BREATHING_ISSUE == 'No' %}selected{% endif %}>No</option>
-                                    <option value="Yes" {% if cancer_form.BREATHING_ISSUE == 'Yes' %}selected{% endif %}>Yes</option>
+                                    <option value="No" {% if cancer_form.BREATHING_ISSUE=='No' %}selected{% endif %}>No
+                                    </option>
+                                    <option value="Yes" {% if cancer_form.BREATHING_ISSUE=='Yes' %}selected{% endif %}>
+                                        Yes</option>
                                 </select>
                             </label>
 
                             <label>
                                 Alcohol Consumption
                                 <select name="ALCOHOL_CONSUMPTION" required>
-                                    <option value="No" {% if cancer_form.ALCOHOL_CONSUMPTION == 'No' %}selected{% endif %}>No</option>
-                                    <option value="Yes" {% if cancer_form.ALCOHOL_CONSUMPTION == 'Yes' %}selected{% endif %}>Yes</option>
+                                    <option value="No" {% if cancer_form.ALCOHOL_CONSUMPTION=='No' %}selected{% endif
+                                        %}>No</option>
+                                    <option value="Yes" {% if cancer_form.ALCOHOL_CONSUMPTION=='Yes' %}selected{% endif
+                                        %}>Yes</option>
                                 </select>
                             </label>
 
                             <label>
                                 Throat Discomfort
                                 <select name="THROAT_DISCOMFORT" required>
-                                    <option value="No" {% if cancer_form.THROAT_DISCOMFORT == 'No' %}selected{% endif %}>No</option>
-                                    <option value="Yes" {% if cancer_form.THROAT_DISCOMFORT == 'Yes' %}selected{% endif %}>Yes</option>
+                                    <option value="No" {% if cancer_form.THROAT_DISCOMFORT=='No' %}selected{% endif %}>
+                                        No</option>
+                                    <option value="Yes" {% if cancer_form.THROAT_DISCOMFORT=='Yes' %}selected{% endif
+                                        %}>Yes</option>
                                 </select>
                             </label>
 
                             <label>
                                 <div class="field-label-row">
                                     <span>Oxygen Saturation (SpO₂ %)</span>
-                                    <span class="info-icon" tabindex="0" data-tip-id="oxygen_saturation" aria-label="Oxygen Saturation info">ℹ</span>
+                                    <span class="info-icon" tabindex="0" data-tip-id="oxygen_saturation"
+                                        aria-label="Oxygen Saturation info">ℹ</span>
                                 </div>
-                                <input type="number" name="OXYGEN_SATURATION" value="{{ cancer_form.OXYGEN_SATURATION }}" min="0" max="100" placeholder="e.g. 98" required>
+                                <input type="number" name="OXYGEN_SATURATION"
+                                    value="{{ cancer_form.OXYGEN_SATURATION }}" min="0" max="100" placeholder="e.g. 98"
+                                    required>
                             </label>
 
                             <label>
                                 Chest Thightness
                                 <select name="CHEST_TIGHTNESS" required>
-                                    <option value="No" {% if cancer_form.CHEST_TIGHTNESS == 'No' %}selected{% endif %}>No</option>
-                                    <option value="Yes" {% if cancer_form.CHEST_TIGHTNESS == 'Yes' %}selected{% endif %}>Yes</option>
+                                    <option value="No" {% if cancer_form.CHEST_TIGHTNESS=='No' %}selected{% endif %}>No
+                                    </option>
+                                    <option value="Yes" {% if cancer_form.CHEST_TIGHTNESS=='Yes' %}selected{% endif %}>
+                                        Yes</option>
                                 </select>
                             </label>
 
                             <label>
                                 Family History
                                 <select name="FAMILY_HISTORY" required>
-                                    <option value="No" {% if cancer_form.FAMILY_HISTORY == 'No' %}selected{% endif %}>No</option>
-                                    <option value="Yes" {% if cancer_form.FAMILY_HISTORY == 'Yes' %}selected{% endif %}>Yes</option>
+                                    <option value="No" {% if cancer_form.FAMILY_HISTORY=='No' %}selected{% endif %}>No
+                                    </option>
+                                    <option value="Yes" {% if cancer_form.FAMILY_HISTORY=='Yes' %}selected{% endif %}>
+                                        Yes</option>
                                 </select>
                             </label>
 
                             <label>
                                 Smoking Family History
                                 <select name="SMOKING_FAMILY_HISTORY" required>
-                                    <option value="No" {% if cancer_form.SMOKING_FAMILY_HISTORY == 'No' %}selected{% endif %}>No</option>
-                                    <option value="Yes" {% if cancer_form.SMOKING_FAMILY_HISTORY == 'Yes' %}selected{% endif %}>Yes</option>
+                                    <option value="No" {% if cancer_form.SMOKING_FAMILY_HISTORY=='No' %}selected{% endif
+                                        %}>No</option>
+                                    <option value="Yes" {% if cancer_form.SMOKING_FAMILY_HISTORY=='Yes' %}selected{%
+                                        endif %}>Yes</option>
                                 </select>
                             </label>
 
                             <label>
                                 Stress Immune
                                 <select name="STRESS_IMMUNE" required>
-                                    <option value="No" {% if cancer_form.STRESS_IMMUNE == 'No' %}selected{% endif %}>No</option>
-                                    <option value="Yes" {% if cancer_form.STRESS_IMMUNE == 'Yes' %}selected{% endif %}>Yes</option>
+                                    <option value="No" {% if cancer_form.STRESS_IMMUNE=='No' %}selected{% endif %}>No
+                                    </option>
+                                    <option value="Yes" {% if cancer_form.STRESS_IMMUNE=='Yes' %}selected{% endif %}>Yes
+                                    </option>
                                 </select>
                             </label>
 
                         </div>
 
-                        <button type="submit" class="btn btn-primary" style="margin-top:24px;">Predict Cancer Risk</button>
+                        <button type="submit" class="btn btn-primary" style="margin-top:24px;">Predict Cancer
+                            Risk</button>
                     </form>
 
 
-                <script>
+                    <script>
                         document.addEventListener('DOMContentLoaded', function () {
                             const form = document.getElementById('cancerForm');
                             const resultWrapper = document.getElementById('cancer-prediction-result-wrapper');
@@ -323,38 +364,39 @@
                                 }, 150);
                             }
 
-                            const initialResult = {{ cancer_result|default(None)|tojson|safe }};
-                            if (initialResult) {
-                                setTimeout(() => {
-                                    cancerPieChartLeft = drawCancerPieChart(initialResult.probability, 'cancerResultPieChart', null);
-                                }, 100);
-                            }
+                            const initialResult = {{ cancer_result|default (None) | tojson | safe
+                        }};
+                        if (initialResult) {
+                            setTimeout(() => {
+                                cancerPieChartLeft = drawCancerPieChart(initialResult.probability, 'cancerResultPieChart', null);
+                            }, 100);
+                        }
 
-                            if (!form) return;
+                        if (!form) return;
 
-                            form.addEventListener('submit', async function (e) {
-                                e.preventDefault();
-                                const url = (form.action || window.location.href).split('#')[0];
-                                const data = new FormData(form);
-                                try {
-                                    const resp = await fetch(url, {
-                                        method: 'POST',
-                                        body: data,
-                                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                                    });
-                                    const json = await resp.json();
-                                    if (!resp.ok) {
-                                        throw new Error(json.message || 'Prediction request failed');
-                                    }
-                                    showCancerResult(json);
-                                } catch (err) {
-                                    resultWrapper.innerHTML = `
+                        form.addEventListener('submit', async function (e) {
+                            e.preventDefault();
+                            const url = (form.action || window.location.href).split('#')[0];
+                            const data = new FormData(form);
+                            try {
+                                const resp = await fetch(url, {
+                                    method: 'POST',
+                                    body: data,
+                                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                                });
+                                const json = await resp.json();
+                                if (!resp.ok) {
+                                    throw new Error(json.message || 'Prediction request failed');
+                                }
+                                showCancerResult(json);
+                            } catch (err) {
+                                resultWrapper.innerHTML = `
                                         <div class="card result-box" style="padding:24px;border-radius:22px;">
                                             <h3 style="margin-bottom:10px;color:white;">Error</h3>
                                             <p style="color:var(--gray-200);">Unable to get prediction. Please try again.</p>
                                         </div>`;
-                                }
-                            });
+                            }
+                        });
                         });
                     </script>
                 </div>
@@ -418,71 +460,72 @@
     <div id="globalFieldTip" class="global-field-tip" role="tooltip" aria-live="polite"></div>
 
     <script>
-    (function () {
-        const TIPS = {
-            energy_level: {
-                title: 'Energy Level (0\u2013100)',
-                html: `<table>
+        (function () {
+            const TIPS = {
+                energy_level: {
+                    title: 'Energy Level (0\u2013100)',
+                    html: `<table>
                     <tr><td>1\u201320</td><td>Very Low &ndash; Constant fatigue, difficulty with daily tasks</td></tr>
                     <tr><td>21\u201340</td><td>Low &ndash; Frequently tired, reduced stamina</td></tr>
                     <tr><td>41\u201360</td><td>Moderate &ndash; Average energy for daily tasks</td></tr>
                     <tr><td>61\u201380</td><td>High &ndash; Active, good stamina, rarely tired</td></tr>
                     <tr><td>81\u2013100</td><td>Very High &ndash; Excellent energy, highly active</td></tr>
                 </table>`
-            },
-            oxygen_saturation: {
-                title: 'Oxygen Saturation (SpO\u2082 %)',
-                html: `<table>
+                },
+                oxygen_saturation: {
+                    title: 'Oxygen Saturation (SpO\u2082 %)',
+                    html: `<table>
                     <tr><td>95\u2013100</td><td>Normal &ndash; Healthy oxygen level</td></tr>
                     <tr><td>90\u201394</td><td>Slightly Low &ndash; Monitor closely</td></tr>
                     <tr><td>&lt; 90</td><td>Low &ndash; Medical attention recommended</td></tr>
                     <tr><td>&lt; 80</td><td>Severely Low &ndash; Emergency care required</td></tr>
                 </table>
                 <p style="margin-top:8px;">Enter your blood oxygen level as a percentage (e.g. <strong>98</strong>).</p>`
+                }
+            };
+
+            const tip = document.getElementById('globalFieldTip');
+            let hideTimer = null;
+
+            function showTip(icon) {
+                const id = icon.dataset.tipId;
+                if (!id || !TIPS[id]) return;
+                clearTimeout(hideTimer);
+                tip.innerHTML = `<div class="info-tooltip-title">${TIPS[id].title}</div>${TIPS[id].html}`;
+                tip.style.display = 'block';
+                positionTip(icon);
             }
-        };
 
-        const tip = document.getElementById('globalFieldTip');
-        let hideTimer = null;
+            function hideTip() {
+                hideTimer = setTimeout(() => { tip.style.display = 'none'; }, 80);
+            }
 
-        function showTip(icon) {
-            const id = icon.dataset.tipId;
-            if (!id || !TIPS[id]) return;
-            clearTimeout(hideTimer);
-            tip.innerHTML = `<div class="info-tooltip-title">${TIPS[id].title}</div>${TIPS[id].html}`;
-            tip.style.display = 'block';
-            positionTip(icon);
-        }
+            function positionTip(icon) {
+                const rect = icon.getBoundingClientRect();
+                const tipW = 300;
+                const tipH = tip.offsetHeight || 200;
+                const vw = window.innerWidth;
+                const vh = window.innerHeight;
+                let left = rect.right + 10;
+                if (left + tipW > vw - 12) { left = rect.left - tipW - 10; }
+                if (left < 8) left = 8;
+                let top = rect.top + rect.height / 2 - tipH / 2;
+                if (top < 8) top = 8;
+                if (top + tipH > vh - 8) top = vh - tipH - 8;
+                tip.style.left = left + 'px';
+                tip.style.top = top + 'px';
+            }
 
-        function hideTip() {
-            hideTimer = setTimeout(() => { tip.style.display = 'none'; }, 80);
-        }
-
-        function positionTip(icon) {
-            const rect = icon.getBoundingClientRect();
-            const tipW = 300;
-            const tipH = tip.offsetHeight || 200;
-            const vw = window.innerWidth;
-            const vh = window.innerHeight;
-            let left = rect.right + 10;
-            if (left + tipW > vw - 12) { left = rect.left - tipW - 10; }
-            if (left < 8) left = 8;
-            let top = rect.top + rect.height / 2 - tipH / 2;
-            if (top < 8) top = 8;
-            if (top + tipH > vh - 8) top = vh - tipH - 8;
-            tip.style.left = left + 'px';
-            tip.style.top = top + 'px';
-        }
-
-        document.querySelectorAll('.info-icon[data-tip-id]').forEach(icon => {
-            icon.addEventListener('mouseenter', () => showTip(icon));
-            icon.addEventListener('focus', () => showTip(icon));
-            icon.addEventListener('mouseleave', hideTip);
-            icon.addEventListener('blur', hideTip);
-        });
-    })();
+            document.querySelectorAll('.info-icon[data-tip-id]').forEach(icon => {
+                icon.addEventListener('mouseenter', () => showTip(icon));
+                icon.addEventListener('focus', () => showTip(icon));
+                icon.addEventListener('mouseleave', hideTip);
+                icon.addEventListener('blur', hideTip);
+            });
+        })();
     </script>
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
+
 </html>
