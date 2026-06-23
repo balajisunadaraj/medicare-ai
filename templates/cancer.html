@@ -95,6 +95,26 @@
                     <div style="margin-top:32px;padding:20px;border-radius:18px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.18);">
                         <strong>Important:</strong> This tool is not a substitute for professional medical evaluation. Use it only as an informational guide.
                     </div>
+
+                    <!-- Result card shown below precautions after prediction -->
+                    <div id="cancer-prediction-result-wrapper" style="margin-top:28px;">
+                        {% if cancer_result %}
+                        <div class="card result-box" style="padding:24px;border-radius:22px;">
+                            <h3 style="margin-bottom:10px;color:white;">{{ cancer_result.label }}</h3>
+                            <p style="color:var(--gray-200);">{{ cancer_result.message }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Pie chart shown below result -->
+                    <div id="cancer-chart-card-wrapper" style="{% if not cancer_result %}display:none;{% endif %} margin-top:28px;">
+                        <div class="chart-card">
+                            <h3>Prediction Probability</h3>
+                            <div class="chart-wrapper" style="position:relative;height:300px;width:100%;">
+                                <canvas id="cancerResultPieChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="predict-panel">
@@ -195,8 +215,11 @@
                             </label>
 
                             <label>
-                                Oxygen Satuaration
-                                <input type="number" name="OXYGEN_SATURATION" value="{{ cancer_form.OXYGEN_SATURATION }}" min="0" max="100" placeholder="Oxygen Saturation" required>
+                                <div class="field-label-row">
+                                    <span>Oxygen Saturation (SpO₂ %)</span>
+                                    <span class="info-icon" tabindex="0" data-tip-id="oxygen_saturation" aria-label="Oxygen Saturation info">ℹ</span>
+                                </div>
+                                <input type="number" name="OXYGEN_SATURATION" value="{{ cancer_form.OXYGEN_SATURATION }}" min="0" max="100" placeholder="e.g. 98" required>
                             </label>
 
                             <label>
@@ -236,30 +259,11 @@
                         <button type="submit" class="btn btn-primary" style="margin-top:24px;">Predict Cancer Risk</button>
                     </form>
 
-                    <div id="cancer-prediction-result-wrapper">
-                        {% if cancer_result %}
-                        <div class="card result-box" style="margin-top:28px;padding:24px;border-radius:22px;">
-                            <h3 style="margin-bottom:10px;color:white;">{{ cancer_result.label }}</h3>
-                            <p style="color:var(--gray-200);">{{ cancer_result.message }}</p>
-                        </div>
-                        {% endif %}
-                    </div>
-
-                    <div id="cancer-chart-inline-wrapper" style="{% if not cancer_result %}display:none;{% endif %} margin-top:28px;">
-                        <div class="chart-card">
-                            <h3>Prediction Probability</h3>
-                            <div class="chart-wrapper" style="position:relative;height:300px;width:100%;">
-                                <canvas id="cancerResultPieChart2"></canvas>
-                            </div>
-                        </div>
-                    </div>
 
                 <script>
                         document.addEventListener('DOMContentLoaded', function () {
                             const form = document.getElementById('cancerForm');
                             const resultWrapper = document.getElementById('cancer-prediction-result-wrapper');
-                            const inlineChartWrapper = document.getElementById('cancer-chart-inline-wrapper');
-                            let cancerPieChart2 = null;
                             let cancerPieChartLeft = null;
 
                             function escapeHtml(value) {
@@ -295,29 +299,23 @@
                             }
 
                             function showCancerResult(result) {
-                                // Show result text
+                                // Show result card in left panel (below precautions)
                                 resultWrapper.innerHTML = `
-                                    <div class="card result-box" style="margin-top:28px;padding:24px;border-radius:22px;">
+                                    <div class="card result-box" style="padding:24px;border-radius:22px;">
                                         <h3 style="margin-bottom:10px;color:white;">${escapeHtml(result.label)}</h3>
                                         <p style="color:var(--gray-200);">${escapeHtml(result.message)}</p>
                                     </div>`;
 
-                                // Show left-panel chart
+                                // Show left-panel pie chart below result
                                 const leftChartWrapper = document.getElementById('cancer-chart-card-wrapper');
                                 if (leftChartWrapper) {
                                     leftChartWrapper.style.display = 'block';
-                                }
-                                cancerPieChartLeft = drawCancerPieChart(result.probability, 'cancerResultPieChart', cancerPieChartLeft);
-
-                                // Show inline chart below result
-                                if (inlineChartWrapper) {
-                                    inlineChartWrapper.style.display = 'block';
                                     setTimeout(() => {
-                                        cancerPieChart2 = drawCancerPieChart(result.probability, 'cancerResultPieChart2', cancerPieChart2);
+                                        cancerPieChartLeft = drawCancerPieChart(result.probability, 'cancerResultPieChart', cancerPieChartLeft);
                                     }, 100);
                                 }
 
-                                // Scroll to result
+                                // Scroll to result in left panel
                                 setTimeout(() => {
                                     const navbarHeight = document.querySelector('.navbar')?.offsetHeight || 0;
                                     const targetY = resultWrapper.getBoundingClientRect().top + window.pageYOffset - navbarHeight - 16;
@@ -327,13 +325,9 @@
 
                             const initialResult = {{ cancer_result|default(None)|tojson|safe }};
                             if (initialResult) {
-                                cancerPieChartLeft = drawCancerPieChart(initialResult.probability, 'cancerResultPieChart', null);
-                                if (inlineChartWrapper) {
-                                    inlineChartWrapper.style.display = 'block';
-                                    setTimeout(() => {
-                                        cancerPieChart2 = drawCancerPieChart(initialResult.probability, 'cancerResultPieChart2', null);
-                                    }, 100);
-                                }
+                                setTimeout(() => {
+                                    cancerPieChartLeft = drawCancerPieChart(initialResult.probability, 'cancerResultPieChart', null);
+                                }, 100);
                             }
 
                             if (!form) return;
@@ -354,7 +348,11 @@
                                     }
                                     showCancerResult(json);
                                 } catch (err) {
-                                    resultWrapper.innerHTML = `\n                                        <div class="card result-box" style="margin-top:28px;padding:24px;border-radius:22px;">\n                                            <h3 style="margin-bottom:10px;color:white;">Error</h3>\n                                            <p style="color:var(--gray-200);">Unable to get prediction. Please try again.</p>\n                                        </div>`;
+                                    resultWrapper.innerHTML = `
+                                        <div class="card result-box" style="padding:24px;border-radius:22px;">
+                                            <h3 style="margin-bottom:10px;color:white;">Error</h3>
+                                            <p style="color:var(--gray-200);">Unable to get prediction. Please try again.</p>
+                                        </div>`;
                                 }
                             });
                         });
@@ -431,6 +429,16 @@
                     <tr><td>61\u201380</td><td>High &ndash; Active, good stamina, rarely tired</td></tr>
                     <tr><td>81\u2013100</td><td>Very High &ndash; Excellent energy, highly active</td></tr>
                 </table>`
+            },
+            oxygen_saturation: {
+                title: 'Oxygen Saturation (SpO\u2082 %)',
+                html: `<table>
+                    <tr><td>95\u2013100</td><td>Normal &ndash; Healthy oxygen level</td></tr>
+                    <tr><td>90\u201394</td><td>Slightly Low &ndash; Monitor closely</td></tr>
+                    <tr><td>&lt; 90</td><td>Low &ndash; Medical attention recommended</td></tr>
+                    <tr><td>&lt; 80</td><td>Severely Low &ndash; Emergency care required</td></tr>
+                </table>
+                <p style="margin-top:8px;">Enter your blood oxygen level as a percentage (e.g. <strong>98</strong>).</p>`
             }
         };
 
