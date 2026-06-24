@@ -15,7 +15,7 @@ app.secret_key = "Medicare-ai@123#"
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
     "MEDICARE_DATABASE_URI",
-    f"sqlite:///{os.path.join(basedir, 'medicare.db')}"
+    f"sqlite:///{os.path.join(basedir, 'medicare.db').replace('\\\\', '/')}"
 )
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["REMEMBER_COOKIE_DURATION"] = timedelta(days=30)
@@ -558,10 +558,6 @@ def predict_heart():
             
             result = predict_heart_disease(form)
             
-            # Handle AJAX requests first
-            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-                return jsonify(result)
-            
             # Persist prediction to database
             try:
                 record = PredictionRecord(
@@ -586,6 +582,10 @@ def predict_heart():
             except Exception as db_error:
                 db.session.rollback()
                 print(f"Database error saving heart prediction: {str(db_error)}")
+                
+            # Handle AJAX requests after prediction and best-effort persistence
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return jsonify(result)
         except Exception as e:
             result = {
                 "label": "Error",
