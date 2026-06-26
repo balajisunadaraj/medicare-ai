@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 import pandas as pd
 from flask import Flask, render_template, request, jsonify, redirect, url_for
-from auth import init_auth, login_manager, UserMixin, login_user, logout_user, current_user
+from auth import init_auth, login_manager, UserMixin, login_user, logout_user, current_user, login_required
 from database import db, init_db
 from werkzeug.security import generate_password_hash, check_password_hash
 from Cancer_prediction_dataset import LUNG_CANCER_FEATURES
@@ -13,9 +13,10 @@ app = Flask("Medicare")
 app.secret_key = "Medicare-ai@123#"
 
 basedir = os.path.abspath(os.path.dirname(__file__))
+db_path = os.path.join(basedir, 'medicare.db').replace('\\', '/')
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
     "MEDICARE_DATABASE_URI",
-    f"sqlite:///{os.path.join(basedir, 'medicare.db').replace('\\\\', '/')}"
+    f"sqlite:///{db_path}"
 )
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["REMEMBER_COOKIE_DURATION"] = timedelta(days=30)
@@ -519,11 +520,13 @@ def contact():
 
 
 @app.route("/predict", methods=["GET"])
+@login_required
 def predict():
     return render_template("predict_main.html")
 
 
 @app.route("/predict_heart", methods=["GET", "POST"])
+@login_required
 def predict_heart():
     result = None
     form = {
@@ -606,6 +609,7 @@ def predict_heart():
 
 
 @app.route("/cancer", methods=["GET", "POST"])
+@login_required
 def cancer():
     cancer_result = None
     cancer_form = CANCER_FORM_DEFAULTS.copy()

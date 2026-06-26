@@ -1,5 +1,5 @@
 try:
-    from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user
+    from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
 except ImportError as exc:
     raise ImportError(
         "Flask-Login is not installed in this Python interpreter. "
@@ -29,6 +29,7 @@ __all__ = [
     "login_user",
     "logout_user",
     "current_user",
+    "login_required",
     "generate_password_hash",
     "check_password_hash"
 ]

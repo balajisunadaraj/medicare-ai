@@ -1,0 +1,8 @@
+1.in the venue booking the form getting two dates(one is an event starting date and another is an target date). now I dont need the target date remove it from the venue booking form. when the staff selects an venue the booked dates for that venue has to show above the form. and if the staff selects an already booked date for that venue it has to show the message "The venue was already booked on that date".
+2.in the event and courses uploading page there is an textarea for getting description in the sports event form. now i need that description box in the courses(certificate and diplamo courses) and inter and intra colligiate events.
+3.change the entire projects css into neat and clear one without any professional css make it with simple and neat css it has to look like a css which was wrote by a beginner(use highlight on hovering some boxes css).if the css of any page looks professional make it simple
+4.review the webisite's new changes and create the database if any changes is needed
+
+1.home page header and footer doesn't shown on other pages make it for all other pages(except for admin.html) so that i can navigate through my website
+2.add css for view button on the available courses and available events page and place the buttons with neat padding in everywhere the buttons are.
+3. make the admin page css as same as the home page
