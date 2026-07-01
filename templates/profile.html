@@ -173,6 +173,60 @@
                         personalized summary.</p>
                     {% endif %}
                 </div>
+                <div class="profile-panel" style="grid-column:1 / -1; margin-top:24px;">
+                    <h3>Health Reminders</h3>
+                    <p style="color:var(--gray-200); margin-bottom:18px;">Set and manage reminders for exercise, diet, sleep,
+                        and preventive care.</p>
+                    <form method="post" class="auth-form" style="margin-bottom:24px;">
+                        <input type="hidden" name="auth_action" value="reminder">
+                        <div class="form-group">
+                            <label>Reminder Title</label>
+                            <input type="text" name="title" placeholder="Example: Morning walk" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Reminder Type</label>
+                            <select name="reminder_type" required>
+                                <option value="exercise">Exercise</option>
+                                <option value="nutrition">Nutrition</option>
+                                <option value="sleep">Sleep</option>
+                                <option value="general">General Wellness</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Message</label>
+                            <input type="text" name="message" placeholder="Example: Take a 20-minute walk" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Date and Time</label>
+                            <input type="datetime-local" name="reminder_datetime" required>
+                        </div>
+                        <div class="form-group" style="align-items:center; display:flex; gap:12px;">
+                            <input type="checkbox" id="reminderActive" name="is_active" checked>
+                            <label for="reminderActive" style="margin:0;">Active reminder</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Reminder</button>
+                    </form>
+
+                    {% if reminders %}
+                    <div class="reminder-list" style="display:grid; gap:14px;">
+                        {% for reminder in reminders %}
+                        <div class="reminder-item" style="padding:18px; border-radius:14px; background:rgba(15,23,42,.85);">
+                            <div style="display:flex; justify-content:space-between; align-items:center; gap:16px;">
+                                <div>
+                                    <strong style="font-size:1rem;">{{ reminder.title }}</strong>
+                                    <p style="margin:4px 0 0; color:var(--gray-300);">{{ reminder.reminder_type | capitalize }}</p>
+                                </div>
+                                <span style="font-size:0.85rem; color:var(--gray-400);">{{ reminder.reminder_datetime.strftime('%Y-%m-%d %H:%M') }}</span>
+                            </div>
+                            <p style="margin:12px 0 0; color:var(--gray-200);">{{ reminder.message }}</p>
+                            <p style="margin-top:10px; color:var(--gray-400); font-size:0.85rem;">Status: {{ 'Active' if reminder.is_active else 'Inactive' }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p style="color:var(--gray-200);">No reminders yet. Create one to stay consistent with healthy daily habits.</p>
+                    {% endif %}
+                </div>
             </div>
             {% else %}
             <!-- Login / Register panels with AJAX -->

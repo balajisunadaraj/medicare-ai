@@ -20,6 +20,9 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
 )
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["REMEMBER_COOKIE_DURATION"] = timedelta(days=30)
+app.config["REMEMBER_COOKIE_REFRESH_EACH_REQUEST"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+app.config["SESSION_PERMANENT"] = True
 
 init_auth(app)
 init_db(app)
@@ -491,6 +494,20 @@ class CancerPredictionRecord(db.Model):
         super(CancerPredictionRecord, self).__init__(**kwargs)
 
 
+class Reminder(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    title = db.Column(db.String(128), nullable=False)
+    reminder_type = db.Column(db.String(64), nullable=False, default='general')
+    message = db.Column(db.String(256), nullable=False)
+    reminder_datetime = db.Column(db.DateTime, nullable=False)
+    is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __init__(self, **kwargs):
+        super(Reminder, self).__init__(**kwargs)
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -773,6 +790,35 @@ def profile():
                 db.session.commit()
                 dashboard = build_health_dashboard(form)
 
+        elif action == "reminder":
+            if not current_user.is_authenticated:
+                auth_message = "Please log in before creating reminders."
+            else:
+                title = request.form.get("title", "").strip()
+                reminder_type = request.form.get("reminder_type", "general")
+                message = request.form.get("message", "").strip()
+                reminder_datetime = request.form.get("reminder_datetime", "").strip()
+                is_active = request.form.get("is_active") == "on"
+                if not title or not reminder_datetime:
+                    auth_message = "Reminder title and date/time are required."
+                else:
+                    try:
+                        reminder_dt = datetime.fromisoformat(reminder_datetime)
+                        reminder_record = Reminder(
+                            user_id=current_user.id,
+                            title=title,
+                            reminder_type=reminder_type,
+                            message=message,
+                            reminder_datetime=reminder_dt,
+                            is_active=is_active,
+                        )
+                        db.session.add(reminder_record)
+                        db.session.commit()
+                        auth_message = "Reminder saved successfully."
+                    except ValueError:
+                        auth_message = "Please provide a valid date and time for the reminder."
+
+    reminders = []
     if current_user.is_authenticated:
         latest_profile = Profile.query.filter_by(user_id=current_user.id).order_by(Profile.created_at.desc()).first()
         if latest_profile and dashboard is None:
@@ -792,8 +838,9 @@ def profile():
 
         predictions = PredictionRecord.query.filter_by(user_id=current_user.id).order_by(PredictionRecord.created_at.desc()).limit(10).all()
         cancer_predictions = CancerPredictionRecord.query.filter_by(user_id=current_user.id).order_by(CancerPredictionRecord.created_at.desc()).limit(10).all()
+        reminders = Reminder.query.filter_by(user_id=current_user.id).order_by(Reminder.reminder_datetime.asc()).all()
 
-    return render_template("profile.html", form=form, dashboard=dashboard, predictions=predictions, cancer_predictions=cancer_predictions, auth_message=auth_message)
+    return render_template("profile.html", form=form, dashboard=dashboard, predictions=predictions, cancer_predictions=cancer_predictions, reminders=reminders, auth_message=auth_message)
 
 
 if __name__ == "__main__":
